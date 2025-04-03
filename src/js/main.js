@@ -38,7 +38,25 @@ document.body.appendChild(elements.loader);
 document.addEventListener("DOMContentLoaded", initApp);
 
 async function initApp() {
-    try {
+  try {
+      // Восстанавливаем состояние из localStorage
+      const savedState = localStorage.getItem('pokedexState');
+      if (savedState) {
+          const state = JSON.parse(savedState);
+          currentPage = state.currentPage;
+          currentSort = state.currentSort;
+          currentFilterType = state.currentFilterType;
+          elements.searchInput.value = state.searchTerm;
+          
+          if (state.searchTerm) {
+              elements.searchClear.style.display = 'block';
+          }
+          
+          // Устанавливаем значения в селекторы
+          elements.sortSelect.value = currentSort;
+          elements.filterSelect.value = currentFilterType;
+      }
+      
       // Показываем лоадер при загрузке
       elements.loader.style.display = "flex";
       
@@ -53,13 +71,13 @@ async function initApp() {
       
       // Настраиваем обработчики событий
       setupEventListeners();
-    } catch (error) {
+  } catch (error) {
       console.error("Error initializing app:", error);
-    } finally {
+  } finally {
       // Скрываем лоадер после загрузки
       elements.loader.style.display = "none";
-    }
   }
+}
 
 async function fetchTotalPokemonCount() {
   try {
@@ -156,11 +174,12 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
 
   const card = document.createElement("div");
   card.className = "card";
+  card.dataset.id = pokemonID; // Сохраняем ID в data-атрибуте
 
   const types = pokemonData.types.map(type => type.type.name);
   const typesHTML = types.map(type => `
     <div class="card__type ${type}">
-      <img src="img/types/${type}.svg" title="${type}" alt="${type}"/>
+      <img src="public/img/types/${type}.svg" title="${type}" alt="${type}"/>
       <div>${type}</div>
     </div>
   `).join("");
@@ -204,6 +223,10 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
   });
 
   card.querySelector(".card__img").appendChild(img);
+
+  card.addEventListener("click", () => {
+    openPokemonDetails(pokemonID);
+  });
 
   return { card, imageLoadPromise };
 }
@@ -449,4 +472,23 @@ async function handleTypeFilterChange() {
       console.error("Error fetching all pokemons:", error);
       throw error;
     }
+  }
+
+
+
+
+  function openPokemonDetails(pokemonID) {
+    // Сохраняем текущее состояние приложения
+    const state = {
+      currentPage,
+      currentSort,
+      currentFilterType,
+      searchTerm: elements.searchInput.value
+    };
+    
+    localStorage.setItem('pokedexState', JSON.stringify(state));
+    localStorage.setItem('currentPokemonID', pokemonID);
+    
+    // Переходим на страницу деталей
+    window.location.href = `details.html?id=${pokemonID}`;
   }

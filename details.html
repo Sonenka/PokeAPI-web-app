@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/css/reset.css">
+    <link rel="stylesheet" href="src/css/variables.css">
+    <link rel="stylesheet" href="src/css/details.css">
+</head>
+<body>
+    <div class="details-container">
+        <div class="details-header">
+            <button id="backButton" class="back-button">← Back to Pokedex</button>
+            <h1 id="pokemonName"></h1>
+            <div id="pokemonID" class="pokemon-id"></div>
+        </div>
+        
+        <div class="details-main">
+            <div class="pokemon-image-container">
+                <img id="pokemonImage" class="pokemon-image" src="" alt="">
+                <div class="types-container" id="typesContainer"></div>
+            </div>
+            
+            <div class="pokemon-info">
+                <div class="info-section">
+                    <h2>General Info</h2>
+                    <div class="info-grid">
+                        <div>Height:</div>
+                        <div id="pokemonHeight"></div>
+                        <div>Weight:</div>
+                        <div id="pokemonWeight"></div>
+                        <div>Base Experience:</div>
+                        <div id="pokemonBaseExp"></div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h2>Stats</h2>
+                    <div class="stats-container" id="statsContainer"></div>
+                </div>
+                
+                <div class="info-section">
+                    <h2>Abilities</h2>
+                    <div class="abilities-container" id="abilitiesContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/js/details.js"></script>
+</body>
+</html>
