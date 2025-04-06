@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-    <link rel="shortcut icon" href="public/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="src/css/reset.css">
     <link rel="stylesheet" href="src/css/variables.css">
     <link rel="stylesheet" href="src/css/style.css">
@@ -14,12 +14,13 @@
     <link rel="stylesheet" href="src/css/search.css">
     <link rel="stylesheet" href="src/css/loader.css">
     <link rel="stylesheet" href="src/css/details.css">
+    <script src="src/js/main.js" defer></script>
 </head>
 <body>
     <main class="main">
         <div class="search">
             <div class="search-container">
-                <input type="text" class="search__input" id="search__input" placeholder="Search Pokémon...">
+                <input type="text" class="search__input" id="search__input" value="" placeholder="Search Pokémon...">
                 <span class="search__clear" id="search__clear">&#10006;</span>
             </div>
 
@@ -96,7 +97,5 @@
             </div>
         </div>
     </main>
-
-    <script src="src/js/main.js" defer></script>
 </body>
 </html>

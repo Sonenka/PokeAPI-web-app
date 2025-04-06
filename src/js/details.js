@@ -1,24 +1,28 @@
-document.addEventListener("DOMContentLoaded", async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const pokemonID = urlParams.get('id') || localStorage.getItem('currentPokemonID');
-    
-    if (!pokemonID) {
-        window.location.href = 'index.html';
-        return;
-    }
+const pokemonID = new URLSearchParams(window.location.search).get('id') || 
+                 localStorage.getItem('currentPokemonID');
 
-    try {
-        const pokemonData = await fetchPokemonData(pokemonID);
-        displayPokemonDetails(pokemonData);
-    } catch (error) {
-        console.error("Error loading Pokémon details:", error);
-        window.location.href = 'index.html';
-    }
+if (!pokemonID) {
+  window.location.href = 'index.html';
+} else {
+  loadAndDisplayPokemon(pokemonID);
+  setupBackButton();
+}
 
-    document.getElementById('backButton').addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
-});
+async function loadAndDisplayPokemon(id) {
+  try {
+    const data = await fetchPokemonData(id);
+    displayPokemonDetails(data);
+  } catch (error) {
+    console.error("Failed to load Pokémon:", error);
+    window.location.href = 'index.html'; 
+  }
+}
+
+function setupBackButton() {
+  document.getElementById('backButton')?.addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+}
 
 async function fetchPokemonData(id) {
     try {

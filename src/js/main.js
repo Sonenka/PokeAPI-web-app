@@ -35,7 +35,7 @@ document.body.appendChild(elements.loader);
 
 
 // Инициализация приложения
-document.addEventListener("DOMContentLoaded", initApp);
+initApp();
 
 async function initApp() {
   try {

@@ -33,7 +33,7 @@
     justify-content: center;
 
     padding: 10px;
-    background-image: url(../../public/img/pokeball.svg);
+    background-image: url(../../img/pokeball.svg);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -41,7 +41,7 @@
 }
 
 .card:hover .card__img {
-    background-image: url(../../public/img/pokeballHover.svg);
+    background-image: url(../../img/pokeballHover.svg);
     transition: all 0.3s ease;
 }
 
