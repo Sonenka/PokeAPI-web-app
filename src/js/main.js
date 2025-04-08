@@ -35,47 +35,66 @@ document.body.appendChild(elements.loader);
 
 
 // Инициализация приложения
-initApp();
+initApp()
 
 async function initApp() {
   try {
-      // Восстанавливаем состояние из localStorage
-      const savedState = localStorage.getItem('pokedexState');
-      if (savedState) {
-          const state = JSON.parse(savedState);
-          currentPage = state.currentPage;
-          currentSort = state.currentSort;
-          currentFilterType = state.currentFilterType;
-          elements.searchInput.value = state.searchTerm;
-          
-          if (state.searchTerm) {
-              elements.searchClear.style.display = 'block';
-          }
-          
-          // Устанавливаем значения в селекторы
-          elements.sortSelect.value = currentSort;
-          elements.filterSelect.value = currentFilterType;
-      }
+    // Восстанавливаем состояние из localStorage
+    const savedState = localStorage.getItem('pokedexState');
+    if (savedState) {
+      const state = JSON.parse(savedState);
       
-      // Показываем лоадер при загрузке
-      elements.loader.style.display = "flex";
+      // Восстанавливаем все параметры
+      currentPage = state.currentPage;
+      currentSort = state.currentSort;
+      currentFilterType = state.currentFilterType;
+      elements.searchInput.value = state.searchTerm || '';
+      
+      // Устанавливаем значения в селекторы
+      elements.sortSelect.value = currentSort;
+      elements.filterSelect.value = currentFilterType;
+      
+      // Показываем крестик очистки, если есть поисковый запрос
+      elements.searchClear.style.display = state.searchTerm ? 'block' : 'none';
       
       // Загружаем всех покемонов
       await fetchAllPokemons();
       
-      // Сортируем покемонов
+      // Применяем сортировку
       sortPokemons();
       
-      // Загружаем первую страницу
+      // Если был поисковый запрос - применяем фильтрацию
+      if (state.searchTerm) {
+        filteredPokemons = allPokemons.filter(pokemon => {
+          const pokemonID = getPokemonIDFromURL(pokemon.url).toString();
+          const pokemonName = pokemon.name.toLowerCase();
+          return pokemonID.includes(state.searchTerm.toLowerCase()) || 
+                 pokemonName.includes(state.searchTerm.toLowerCase());
+        });
+        await displayFilteredPokemons();
+      } 
+      // Если был активен фильтр по типу
+      else if (currentFilterType) {
+        await filterPokemonsByType(currentFilterType);
+      }
+      // Иначе загружаем обычную страницу
+      else {
+        await loadPokemons();
+      }
+    } else {
+      // Стандартная инициализация, если нет сохраненного состояния
+      elements.loader.style.display = "flex";
+      await fetchAllPokemons();
+      sortPokemons();
       await loadPokemons();
-      
-      // Настраиваем обработчики событий
-      setupEventListeners();
+    }
+    
+    // Настраиваем обработчики событий
+    setupEventListeners();
   } catch (error) {
-      console.error("Error initializing app:", error);
+    console.error("Error initializing app:", error);
   } finally {
-      // Скрываем лоадер после загрузки
-      elements.loader.style.display = "none";
+    elements.loader.style.display = "none";
   }
 }
 
@@ -302,12 +321,20 @@ function handleSearch() {
 
 // Функция для сброса поиска и отображения всех покемонов
 function resetSearch() {
-  filteredPokemons = []; 
+  filteredPokemons = [];
   currentPage = 1;
-  loadPokemons(); // Загружаем всех покемонов обратно
-  elements.searchClear.style.display = 'none'; 
+  elements.searchInput.value = '';
+  elements.searchClear.style.display = 'none';
+  loadPokemons();
+  
+  // Очищаем только поисковую часть состояния
+  const savedState = localStorage.getItem('pokedexState');
+  if (savedState) {
+    const state = JSON.parse(savedState);
+    state.searchTerm = '';
+    localStorage.setItem('pokedexState', JSON.stringify(state));
+  }
 }
-
 // Функция для фильтрации покемонов по поисковому запросу
 function filterAndDisplayPokemons(searchTerm) {
   filteredPokemons = allPokemons.filter(pokemon => {
@@ -396,16 +423,27 @@ function sortPokemons() {
 
 
 async function handleTypeFilterChange() {
-    currentFilterType = elements.filterSelect.value;
-    
-    if (currentFilterType === "") {
-      // Если выбран "All Types", сбрасываем фильтрацию
-      resetTypeFilter();
-    } else {
-      // Фильтруем покемонов по выбранному типу
-      await filterPokemonsByType(currentFilterType);
-    }
+  currentFilterType = elements.filterSelect.value;
+  
+  // Сохраняем состояние перед изменением
+  saveCurrentState();
+  
+  if (currentFilterType === "") {
+    resetTypeFilter();
+  } else {
+    await filterPokemonsByType(currentFilterType);
   }
+}
+
+function saveCurrentState() {
+  const state = {
+    currentPage,
+    currentSort,
+    currentFilterType,
+    searchTerm: elements.searchInput.value
+  };
+  localStorage.setItem('pokedexState', JSON.stringify(state));
+}
 
   async function filterPokemonsByType(type) {
     try {
@@ -477,18 +515,19 @@ async function handleTypeFilterChange() {
 
 
 
-  function openPokemonDetails(pokemonID) {
-    // Сохраняем текущее состояние приложения
-    const state = {
-      currentPage,
-      currentSort,
-      currentFilterType,
-      searchTerm: elements.searchInput.value
-    };
-    
-    localStorage.setItem('pokedexState', JSON.stringify(state));
-    localStorage.setItem('currentPokemonID', pokemonID);
-    
-    // Переходим на страницу деталей
-    window.location.href = `details.html?id=${pokemonID}`;
-  }
+function openPokemonDetails(pokemonID) {
+  // Сохраняем текущее состояние приложения
+  const state = {
+    currentPage,
+    currentSort,
+    currentFilterType,
+    searchTerm: elements.searchInput.value,
+    // Добавляем дополнительные параметры, если нужно
+    filteredPokemons: currentFilterType || elements.searchInput.value ? filteredPokemons : null
+  };
+  
+  localStorage.setItem('pokedexState', JSON.stringify(state));
+  localStorage.setItem('currentPokemonID', pokemonID);
+  
+  window.location.href = `details.html?id=${pokemonID}`;
+}

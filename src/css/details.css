@@ -1,8 +1,20 @@
-.details-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+body {
     font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    transition: background 0.5s ease;
+}
+
+.details-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: rgba(255, 255, 255, 0.93);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1;
 }
 
 .details-header {
@@ -13,22 +25,23 @@
 }
 
 .back-button {
-    background: var(--red);
+    background: var(--pokemon-color, #FF696F);
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background 0.3s;
+    transition: all 0.3s;
 }
 
 .back-button:hover {
-    background: #e05555;
+    filter: brightness(1.1);
+    transform: translateY(-2px);
 }
 
 .pokemon-id {
-    background: var(--red);
+    background: var(--pokemon-color, #FF696F);
     color: white;
     padding: 5px 15px;
     border-radius: 20px;
@@ -47,11 +60,17 @@
 
 .pokemon-image {
     width: 100%;
-    max-width: 400px;
+    max-width: 300px;
     height: auto;
     background: #f8f8f8;
     border-radius: 15px;
     padding: 20px;
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+    transition: all 0.3s;
+}
+
+.pokemon-image:hover {
+    transform: scale(1.05);
 }
 
 .types-container {
@@ -69,6 +88,8 @@
     border-radius: 20px;
     color: white;
     font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .info-section {
@@ -76,9 +97,10 @@
 }
 
 .info-section h2 {
-    border-bottom: 2px solid var(--red);
+    border-bottom: 2px solid var(--pokemon-color, #FF696F);
     padding-bottom: 5px;
     margin-bottom: 15px;
+    color: var(--pokemon-color, #FF696F);
 }
 
 .info-grid {
@@ -110,9 +132,9 @@
 
 .stat-bar {
     height: 20px;
-    background: var(--red);
+    background: var(--pokemon-color, #FF696F);
     border-radius: 5px;
-    transition: width 0.5s;
+    transition: width 0.5s ease-out;
 }
 
 .stat-value {
@@ -130,15 +152,21 @@
     background: #f0f0f0;
     padding: 5px 15px;
     border-radius: 20px;
+    font-size: 14px;
 }
 
 .hidden-ability {
-    color: var(--red);
+    color: var(--pokemon-color, #FF696F);
     font-size: 0.8em;
+    margin-left: 5px;
 }
 
 @media (max-width: 768px) {
     .details-main {
         grid-template-columns: 1fr;
+    }
+    
+    .pokemon-image {
+        max-width: 200px;
     }
 }
