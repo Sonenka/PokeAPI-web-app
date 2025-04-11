@@ -1,9 +1,15 @@
+import '../css/reset.css';
+import '../css/variables.css';
+import '../css/style.css';
+import '../css/details.css';
+import '../css/card.css';
+
 // Получаем ID покемона из URL
 const pokemonID = new URLSearchParams(window.location.search).get('id') || 
                  localStorage.getItem('currentPokemonID');
 
 if (!pokemonID) {
-    window.location.href = 'index.html';
+    window.location.href = './index.html';
 } else {
     loadAndDisplayPokemon(pokemonID);
     setupBackButton();
@@ -16,13 +22,13 @@ async function loadAndDisplayPokemon(id) {
         displayPokemonDetails(pokemonData, speciesData);
     } catch (error) {
         console.error("Failed to load Pokémon:", error);
-        window.location.href = 'index.html'; 
+        window.location.href = './index.html'; 
     }
 }
 
 function setupBackButton() {
     document.getElementById('backButton')?.addEventListener('click', () => {
-        window.location.href = 'index.html';
+        window.location.href = './index.html';
     });
 }
 
