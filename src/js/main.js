@@ -198,7 +198,7 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
   const types = pokemonData.types.map(type => type.type.name);
   const typesHTML = types.map(type => `
     <div class="card__type ${type}">
-      <img src="/img/types/${type}.svg" title="${type}" alt="${type}"/>
+      <img src="../img/types/${type}.svg" title="${type}" alt="${type}"/>
       <div>${type}</div>
     </div>
   `).join("");
