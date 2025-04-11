@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <script src="src/js/main.js" defer></script>
+  <link rel="stylesheet" crossorigin href="/PokeAPI-web-app/assets/index-3eAsMnZ9.css">
+</head>
+<body>
+    <main class="main">
+        <div class="search">
+            <div class="search-container">
+                <input type="text" class="search__input" id="search__input" value="" placeholder="Search Pokémon...">
+                <span class="search__clear" id="search__clear">&#10006;</span>
+            </div>
+
+            <div class="dropdown">
+                <label class="dropdown__label" for="dropdownSelect">Sort by:</label>
+                <div class="dropdown__container">
+                    <select class="dropdown__select" id="sortSelect">
+                        <option class="dropdown__option" value="id-asc">ID (Ascending)</option>
+                        <option class="dropdown__option" value="id-desc">ID (Descending)</option>
+                        <option class="dropdown__option" value="name-asc">Name (A - Z)</option>
+                        <option class="dropdown__option" value="name-desc">Name (Z - A)</option>
+                    </select>
+                </div>
+            </div>
+            
+        
+            <div class="dropdown">
+                <label class="dropdown__label" for="filterSelect">Filter by Type:</label>
+                <div class="dropdown__container">
+                    <select class="dropdown__select" id="filterSelect">
+                        <option class="dropdown__option" value="">All Types</option>
+                        <option class="dropdown__option" value="bug">Bug</option>
+                        <option class="dropdown__option" value="dark">Dark</option>
+                        <option class="dropdown__option" value="dragon">Dragon</option>
+                        <option class="dropdown__option" value="electric">Electric</option>
+                        <option class="dropdown__option" value="fire">Fire</option>
+                        <option class="dropdown__option" value="fairy">Fairy</option>
+                        <option class="dropdown__option" value="fighting">Fighting</option>
+                        <option class="dropdown__option" value="flying">Flying</option>
+                        <option class="dropdown__option" value="ghost">Ghost</option>
+                        <option class="dropdown__option" value="grass">Grass</option>
+                        <option class="dropdown__option" value="ground">Ground</option>
+                        <option class="dropdown__option" value="ice">Ice</option>
+                        <option class="dropdown__option" value="normal">Normal</option>
+                        <option class="dropdown__option" value="poison">Poison</option>
+                        <option class="dropdown__option" value="psychic">Psychic</option>
+                        <option class="dropdown__option" value="rock">Rock</option>
+                        <option class="dropdown__option" value="steel">Steel</option>
+                        <option class="dropdown__option" value="water">Water</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <ul class="list-wrapper">
+            <div class="loader-container">
+                <div class="o-pokeball u-tada"></div>
+                <p class="loader-text">Pokémons are coming...</p>
+            </div>
+        </ul>
+
+
+        <div class="pagination">
+            <div class="pagination__buttons">
+                <button class="pagination__button button" id="firstButton">First</button>
+                <button class="pagination__button button" id="prevButton">Previous</button>
+            </div>
+        
+            <div class="pagination__counter" id="pageInfo"></div>
+
+            <div class="pagination__input">
+                <input 
+                    type="number" 
+                    id="pageInput" 
+                    min="1" 
+                    value="1"
+                >
+                <button class="pagination__button button pagination__button--go">Go</button>
+            </div>
+            
+            <div class="pagination__buttons">
+                <button class="pagination__button button" id="nextButton">Next</button>
+                <button class="pagination__button button" id="lastButton">Last</button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
