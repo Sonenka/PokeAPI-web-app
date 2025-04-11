@@ -1,5 +1,18 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
-  base: '/PokeAPI-web-app/', 
-})
+  build: {
+    assetsInclude: ['**/*.svg'],
+    rollupOptions: {
+      output: {
+        assetFileNames: 'assets/[name].[hash].[ext]'
+      }
+    }
+  },
+  resolve: {
+    alias: {
+      '@assets': resolve(__dirname, 'src/assets')
+    }
+  }
+});
