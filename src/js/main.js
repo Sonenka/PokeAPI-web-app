@@ -391,17 +391,17 @@ function clearSearch() {
 }
 
 // Пагинация для отфильтрованных покемонов
-async function loadPage(page) {
-  page = Math.max(1, Math.min(page, totalPages));
-  if (page === currentPage) return;
+// async function loadPage(page) {
+//   page = Math.max(1, Math.min(page, totalPages));
+//   if (page === currentPage) return;
 
-  currentPage = page;
-  if (filteredPokemons.length > 0) {
-    await displayFilteredPokemons();
-  } else {
-    await loadPokemons();
-  }
-}
+//   currentPage = page;
+//   if (filteredPokemons.length > 0) {
+//     await displayFilteredPokemons();
+//   } else {
+//     await loadPokemons();
+//   }
+// }
 
 // Функция сортировки покемонов
 function sortPokemons() {
