@@ -4,32 +4,32 @@ import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.
 import typeIcons from '../dictionaries/typeIcons.js';
 import { capitalizeFirstLetter } from './utils.js';
 import { openPokemonDetails } from './state.js';
+import { filterPokemonsByType } from './handlers/filter.js';
 
 export async function loadPokemons() {
   try {
     mainElements.listWrapper.innerHTML = "";
     mainElements.loader.style.display = "flex";
 
-    // Определяем, какие покемоны загружать (все или отфильтрованные)
-    const pokemonsToLoad = state.currentFilterType ? state.filteredPokemons : state.allPokemons;
-    console.log("Pokemons to load:", pokemonsToLoad); // Логируем, какие покемоны будут загружены
-
+    // Всегда используем filteredPokemons, если они есть (даже если пустые)
+    const pokemonsToLoad = state.filteredPokemons.length > 0 ? state.filteredPokemons : state.allPokemons;
+    
+    // Пересчитываем общее количество страниц
     state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
-    console.log("Total pages:", state.totalPages); // Логируем общее количество страниц
+    
+    // Корректируем текущую страницу, если она выходит за пределы
+    if (state.currentPage > state.totalPages && state.totalPages > 0) {
+      state.currentPage = state.totalPages;
+    }
 
-    // Получаем покемонов для текущей страницы
     const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
     const end = start + POKEMONS_PER_PAGE;
     const currentPagePokemons = pokemonsToLoad.slice(start, end);
 
-    console.log("Current page pokemons:", currentPagePokemons); // Логируем покемонов для текущей страницы
-
-    // Загружаем данные для каждого покемона
     const pokemonDataList = await Promise.all(
       currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
     );
 
-    // Отображаем покемонов
     displayPokemons(currentPagePokemons, pokemonDataList);
     updatePaginationUI();
   } catch (error) {
@@ -128,13 +128,13 @@ export function createPokemonCard(pokemon, pokemonID, pokemonData) {
 }
 
 export function updatePaginationUI() {
-    mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
-    mainElements.pageInput.value = state.currentPage;
-  
-    mainElements.firstButton.disabled = state.currentPage === 1;
-    mainElements.prevButton.disabled = state.currentPage === 1;
-    mainElements.nextButton.disabled = state.currentPage === state.totalPages;
-    mainElements.lastButton.disabled = state.currentPage === state.totalPages;
+  mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
+  mainElements.pageInput.value = state.currentPage;
+
+  mainElements.firstButton.disabled = state.currentPage === 1;
+  mainElements.prevButton.disabled = state.currentPage === 1;
+  mainElements.nextButton.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
+  mainElements.lastButton.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
 }
 
 export async function displayFilteredPokemons() {
@@ -171,9 +171,6 @@ export async function loadPage(page) {
 
   state.currentPage = page;
 
-  if (state.currentFilterType) {
-    await filterPokemonsByType(state.currentFilterType);
-  } else {
-    await loadPokemons();
-  }
+  // Всегда используем loadPokemons, который сам решит, какие данные загружать
+  await loadPokemons();
 }

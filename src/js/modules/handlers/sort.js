@@ -12,6 +12,6 @@ export function sortPokemons() {
     } else if (state.currentSort === 'name-desc') {
         state.allPokemons.sort((a, b) => b.name.localeCompare(a.name));
     }
-
+    state.currentPage = 1;
     loadPokemons(); // Перерисовываем список покемонов
 }

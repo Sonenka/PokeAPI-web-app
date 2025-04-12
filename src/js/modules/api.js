@@ -4,7 +4,7 @@ export const POKEMONS_PER_PAGE = 12;
 
 export async function fetchAllPokemons() {
   try {
-    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=2000");
+    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
     const data = await response.json();
     
     state.allPokemons = data.results.filter(pokemon => {
@@ -38,7 +38,7 @@ export function getPokemonIDFromURL(url) {
 
 export async function fetchTotalPokemonCount() {
   try {
-    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=11000");
+    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
     const data = await response.json();
     
     const filteredPokemons = data.results.filter(pokemon => getPokemonIDFromURL(pokemon.url) < 10000);

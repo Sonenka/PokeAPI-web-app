@@ -20,53 +20,40 @@ export async function handleTypeFilterChange() {
     }
   }
 
-export async function filterPokemonsByType(type) {
+  export async function filterPokemonsByType(type) {
     try {
       mainElements.listWrapper.innerHTML = "";
       mainElements.loader.style.display = "flex";
   
-      // Приводим тип к пустой строке, если это "All types" (на случай сохранённого состояния)
-      const normalizedType = type === "All types" ? "" : type;
-  
-      // Если тип пустой, показываем всех покемонов
-      if (!normalizedType) {
-        console.log("Filtering pokemons by type: All Types");
-        state.filteredPokemons = [...state.allPokemons];
-        state.totalPages = Math.ceil(state.filteredPokemons.length / POKEMONS_PER_PAGE);
-        state.currentPage = 1;
+      if (!type) {
+        // Если тип пустой, сбрасываем фильтрацию
+        state.filteredPokemons = [];
+        state.currentFilterType = "";
       } else {
-        console.log(`Filtering pokemons by type: ${normalizedType}`);
+        // Фильтруем покемонов по типу
         const pokemonDataList = await Promise.all(
           state.allPokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
         );
+        
         state.filteredPokemons = state.allPokemons.filter((pokemon, index) => {
           const pokemonData = pokemonDataList[index];
-          return pokemonData && pokemonData.types.some(t => t.type.name === normalizedType);
+          return pokemonData && pokemonData.types.some(t => t.type.name === type);
         });
-        console.log("Filtered pokemons:", state.filteredPokemons);
-        state.totalPages = Math.ceil(state.filteredPokemons.length / POKEMONS_PER_PAGE);
-        state.currentPage = 1;
+        state.currentFilterType = type;
       }
-  
-      const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
-      const end = start + POKEMONS_PER_PAGE;
-      const currentPagePokemons = state.filteredPokemons.slice(start, end);
-  
-      console.log("Current page pokemons after filter:", currentPagePokemons);
-  
-      const currentPageData = await Promise.all(
-        currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-      );
-  
-      displayPokemons(currentPagePokemons, currentPageData);
-      updatePaginationUI();
+      
+      // Всегда сбрасываем на первую страницу при фильтрации
+      state.currentPage = 1;
+      
+      // Загружаем покемонов с учетом фильтра
+      await loadPokemons();
   
     } catch (error) {
       console.error("Error filtering pokemons by type:", error);
     } finally {
       mainElements.loader.style.display = "none";
     }
-  }
+}
   
 
 export function resetTypeFilter() {

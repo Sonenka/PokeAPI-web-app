@@ -3,11 +3,12 @@ import { handleTypeFilterChange } from "./filter";
 import { handleSearch, clearSearch } from "./search";
 import { state } from "../state";
 import { sortPokemons } from "./sort";
+import { loadPage } from "../render";
 
 export function setupEventListeners() {
     mainElements.firstButton.addEventListener("click", () => loadPage(1));
-    mainElements.prevButton.addEventListener("click", () => loadPage(currentPage - 1));
-    mainElements.nextButton.addEventListener("click", () => loadPage(currentPage + 1));
+    mainElements.prevButton.addEventListener("click", () => loadPage(state.currentPage - 1));
+    mainElements.nextButton.addEventListener("click", () => loadPage(state.currentPage + 1));
     mainElements.lastButton.addEventListener("click", () => loadPage(state.totalPages));
     mainElements.goButton.addEventListener("click", handleGoButtonClick);
     mainElements.pageInput.addEventListener("keypress", (e) => {
@@ -28,7 +29,7 @@ function handleGoButtonClick() {
     if (!isNaN(page) && page >= 1 && page <= state.totalPages) {
       loadPage(page);
     } else {
-      mainElements.pageInput.value = currentPage;
+      mainElements.pageInput.value = state.currentPage;
     }
 }
   
