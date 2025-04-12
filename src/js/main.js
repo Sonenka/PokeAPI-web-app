@@ -11,7 +11,7 @@ import { mainElements } from './dictionaries/elements.js';
 
 import { state } from './modules/state.js';
 import { POKEMONS_PER_PAGE, getPokemonIDFromURL, fetchPokemonData, fetchAllPokemons } from './modules/api.js'
-import { loadPokemons } from './modules/render.js';
+import { loadPokemons, displayFilteredPokemons, displayNoResultsMessage } from './modules/render.js';
 
 async function initApp() {
   try {
@@ -178,34 +178,6 @@ function filterAndDisplayPokemons(searchTerm) {
     displayNoResultsMessage();
   } else {
     displayFilteredPokemons();
-  }
-}
-
-function displayNoResultsMessage() {
-  mainElements.listWrapper.innerHTML = `
-    <div class="no-results">No Pokémon found</div>
-  `;
-}
-
-async function displayFilteredPokemons() {
-  mainElements.listWrapper.innerHTML = "";
-  mainElements.loader.style.display = "flex";
-
-  try {
-    const start = (currentPage - 1) * POKEMONS_PER_PAGE;
-    const end = start + POKEMONS_PER_PAGE;
-    const pokemonsToLoad = filteredPokemons.slice(start, end);
-
-    const pokemonDataList = await Promise.all(
-      pokemonsToLoad.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-    );
-
-    displayPokemons(pokemonsToLoad, pokemonDataList);
-    updatePaginationUI(); // Обновляем пагинацию после поиска
-  } catch (error) {
-    console.error("Error displaying filtered pokemons:", error);
-  } finally {
-    mainElements.loader.style.display = "none";
   }
 }
 

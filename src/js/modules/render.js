@@ -129,3 +129,31 @@ function updatePaginationUI() {
     mainElements.nextButton.disabled = state.currentPage === state.totalPages;
     mainElements.lastButton.disabled = state.currentPage === state.totalPages;
 }
+
+export async function displayFilteredPokemons() {
+    mainElements.listWrapper.innerHTML = "";
+    mainElements.loader.style.display = "flex";
+  
+    try {
+      const start = (currentPage - 1) * POKEMONS_PER_PAGE;
+      const end = start + POKEMONS_PER_PAGE;
+      const pokemonsToLoad = filteredPokemons.slice(start, end);
+  
+      const pokemonDataList = await Promise.all(
+        pokemonsToLoad.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+      );
+  
+      displayPokemons(pokemonsToLoad, pokemonDataList);
+      updatePaginationUI(); // Обновляем пагинацию после поиска
+    } catch (error) {
+      console.error("Error displaying filtered pokemons:", error);
+    } finally {
+      mainElements.loader.style.display = "none";
+    }
+}
+
+export function displayNoResultsMessage() {
+  mainElements.listWrapper.innerHTML = `
+    <div class="no-results">No Pokémon found</div>
+  `;
+}
