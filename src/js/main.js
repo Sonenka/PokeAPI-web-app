@@ -10,28 +10,7 @@ import '../css/media.css';
 import typeIcons from './dictionaries/typeIcons.js';
 import { mainElements } from './dictionaries/elements.js';
 
-// Конфигурация
-const POKEMONS_PER_PAGE = 12;
-let currentPage = 1;
-let totalPages = 1;
-let allPokemons = [];
-let filteredPokemons = [];
-let currentSort = 'id-asc';
-let currentFilterType = "";
-
-// Инициализация лоадера
-mainElements.loader.innerHTML = `
-  <div class="loader-container">
-    <div class="o-pokeball u-tada"></div>
-    <p class="loader-text">Pokémons are coming...</p>
-  </div>
-`;
-
-document.body.appendChild(mainElements.loader);
-
-
-// Инициализация приложения
-initApp()
+import { state } from './modules/state.js';
 
 async function initApp() {
   try {
@@ -156,8 +135,7 @@ async function loadPokemons() {
       mainElements.loader.style.display = "none";
     }
   }
-  
-// Отображение покемонов
+
 function displayPokemons(pokemons, pokemonDataList) {
     mainElements.listWrapper.innerHTML = "";
     mainElements.listWrapper.style.opacity = "0"; // Скрываем, пока не загрузятся все картинки
@@ -183,7 +161,6 @@ function displayPokemons(pokemons, pokemonDataList) {
     });
 }
 
-// Создание карточки покемона
 function createPokemonCard(pokemon, pokemonID, pokemonData) {
   if (!pokemonData) return document.createElement("div");
 
@@ -246,7 +223,6 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
   return { card, imageLoadPromise };
 }
 
-// Загрузка данных покемона
 async function fetchPokemonData(id) {
   try {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
@@ -257,13 +233,11 @@ async function fetchPokemonData(id) {
   }
 }
 
-// Получение ID покемона из URL
 function getPokemonIDFromURL(url) {
   const segments = url.split("/").filter(Boolean);
   return parseInt(segments[segments.length - 1], 10);
 }
 
-// Пагинация
 async function loadPage(page) {
     page = Math.max(1, Math.min(page, totalPages));
     if (page === currentPage) return;
@@ -296,7 +270,6 @@ function updatePaginationUI() {
   mainElements.lastButton.disabled = currentPage === totalPages;
 }
 
-// Вспомогательные функции
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -315,7 +288,6 @@ function handleSearch() {
   mainElements.searchClear.style.display = searchTerm ? "block" : "none";
 }
 
-// Функция для сброса поиска и отображения всех покемонов
 function resetSearch() {
   filteredPokemons = [];
   currentPage = 1;
@@ -349,14 +321,12 @@ function filterAndDisplayPokemons(searchTerm) {
   }
 }
 
-// Функция для отображения сообщения "No Pokémon found"
 function displayNoResultsMessage() {
   mainElements.listWrapper.innerHTML = `
     <div class="no-results">No Pokémon found</div>
   `;
 }
 
-// Отображение отфильтрованных покемонов
 async function displayFilteredPokemons() {
   mainElements.listWrapper.innerHTML = "";
   mainElements.loader.style.display = "flex";
@@ -379,27 +349,12 @@ async function displayFilteredPokemons() {
   }
 }
 
-// Функция для сброса поиска (если поисковая строка пуста)
 function clearSearch() {
   mainElements.searchInput.value = '';
   mainElements.searchClear.style.display = 'none';
   resetSearch();
 }
 
-// Пагинация для отфильтрованных покемонов
-// async function loadPage(page) {
-//   page = Math.max(1, Math.min(page, totalPages));
-//   if (page === currentPage) return;
-
-//   currentPage = page;
-//   if (filteredPokemons.length > 0) {
-//     await displayFilteredPokemons();
-//   } else {
-//     await loadPokemons();
-//   }
-// }
-
-// Функция сортировки покемонов
 function sortPokemons() {
     if (currentSort === 'id-asc') {
         allPokemons.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
@@ -413,10 +368,6 @@ function sortPokemons() {
 
     loadPokemons(); // Перерисовываем список покемонов
 }
-
-
-
-
 
 async function handleTypeFilterChange() {
   currentFilterType = mainElements.filterSelect.value;
@@ -441,75 +392,72 @@ function saveCurrentState() {
   localStorage.setItem('pokedexState', JSON.stringify(state));
 }
 
-  async function filterPokemonsByType(type) {
-    try {
-      mainElements.listWrapper.innerHTML = "";
-      mainElements.loader.style.display = "flex";
+async function filterPokemonsByType(type) {
+  try {
+    mainElements.listWrapper.innerHTML = "";
+    mainElements.loader.style.display = "flex";
+    
+    // Сначала получаем данные всех покемонов
+    const pokemonDataList = await Promise.all(
+      allPokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+    );
+    
+    // Фильтруем покемонов по типу
+    filteredPokemons = allPokemons.filter((pokemon, index) => {
+      const pokemonData = pokemonDataList[index];
+      return pokemonData && pokemonData.types.some(t => t.type.name === type);
+    });
+    
+    totalPages = Math.ceil(filteredPokemons.length / POKEMONS_PER_PAGE);
+    currentPage = 1;
+    
+    if (filteredPokemons.length === 0) {
+      displayNoResultsMessage();
+    } else {
+      // Загружаем данные для отображения (только для текущей страницы)
+      const start = (currentPage - 1) * POKEMONS_PER_PAGE;
+      const end = start + POKEMONS_PER_PAGE;
+      const currentPagePokemons = filteredPokemons.slice(start, end);
       
-      // Сначала получаем данные всех покемонов
-      const pokemonDataList = await Promise.all(
-        allPokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+      const currentPageData = await Promise.all(
+        currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
       );
       
-      // Фильтруем покемонов по типу
-      filteredPokemons = allPokemons.filter((pokemon, index) => {
-        const pokemonData = pokemonDataList[index];
-        return pokemonData && pokemonData.types.some(t => t.type.name === type);
-      });
-      
-      totalPages = Math.ceil(filteredPokemons.length / POKEMONS_PER_PAGE);
-      currentPage = 1;
-      
-      if (filteredPokemons.length === 0) {
-        displayNoResultsMessage();
-      } else {
-        // Загружаем данные для отображения (только для текущей страницы)
-        const start = (currentPage - 1) * POKEMONS_PER_PAGE;
-        const end = start + POKEMONS_PER_PAGE;
-        const currentPagePokemons = filteredPokemons.slice(start, end);
-        
-        const currentPageData = await Promise.all(
-          currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-        );
-        
-        displayPokemons(currentPagePokemons, currentPageData);
-      }
-      
-      updatePaginationUI();
-    } catch (error) {
-      console.error("Error filtering pokemons by type:", error);
-    } finally {
-      mainElements.loader.style.display = "none";
+      displayPokemons(currentPagePokemons, currentPageData);
     }
+    
+    updatePaginationUI();
+  } catch (error) {
+    console.error("Error filtering pokemons by type:", error);
+  } finally {
+    mainElements.loader.style.display = "none";
   }
+}
 
-  function resetTypeFilter() {
+function resetTypeFilter() {
     currentFilterType = "";
     filteredPokemons = [];
     currentPage = 1;
     loadPokemons();
+}
+
+async function fetchAllPokemons() {
+  try {
+    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=11000");
+    const data = await response.json();
+    
+    // Фильтруем только покемонов с ID < 10000
+    allPokemons = data.results.filter(pokemon => {
+      const id = getPokemonIDFromURL(pokemon.url);
+      return id < 10000;
+    });
+    
+    totalPages = Math.ceil(allPokemons.length / POKEMONS_PER_PAGE);
+  } catch (error) {
+    console.error("Error fetching all pokemons:", error);
+    throw error;
   }
-
-  async function fetchAllPokemons() {
-    try {
-      const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=11000");
-      const data = await response.json();
-      
-      // Фильтруем только покемонов с ID < 10000
-      allPokemons = data.results.filter(pokemon => {
-        const id = getPokemonIDFromURL(pokemon.url);
-        return id < 10000;
-      });
-      
-      totalPages = Math.ceil(allPokemons.length / POKEMONS_PER_PAGE);
-    } catch (error) {
-      console.error("Error fetching all pokemons:", error);
-      throw error;
-    }
-  }
-
-
-
+}
 
 function openPokemonDetails(pokemonID) {
   // Сохраняем текущее состояние приложения
@@ -528,3 +476,21 @@ function openPokemonDetails(pokemonID) {
   window.location.href = `details.html?id=${pokemonID}`;
 }
 
+const POKEMONS_PER_PAGE = 12;
+let currentPage = 1;
+let totalPages = 1;
+let allPokemons = [];
+let filteredPokemons = [];
+let currentSort = 'id-asc';
+let currentFilterType = "";
+
+mainElements.loader.innerHTML = `
+  <div class="loader-container">
+    <div class="o-pokeball u-tada"></div>
+    <p class="loader-text">Pokémons are coming...</p>
+  </div>
+`;
+
+document.body.appendChild(mainElements.loader);
+
+initApp()
