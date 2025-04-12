@@ -5,6 +5,7 @@ import '../css/details.css';
 import '../css/card.css';
 
 import typeIcons from './dictionaries/typeIcons.js';
+import { detailsElements } from './dictionaries/elements.js';
 
 // Получаем ID покемона из URL
 const pokemonID = new URLSearchParams(window.location.search).get('id') || 
@@ -29,7 +30,7 @@ async function loadAndDisplayPokemon(id) {
 }
 
 function setupBackButton() {
-    document.getElementById('backButton')?.addEventListener('click', () => {
+    detailsElements.backButton?.addEventListener('click', () => {
         window.location.href = './index.html';
     });
 }
@@ -69,19 +70,17 @@ function displayPokemonDetails(pokemon, speciesData) {
     `;
     
     // Заполняем данные покемона
-    document.getElementById('pokemonName').textContent = 
+    detailsElements.pokemonName.textContent = 
         pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
-    document.getElementById('pokemonID').textContent = `#${String(pokemon.id).padStart(4, '0')}`;
+    detailsElements.pokemonID.textContent = `#${String(pokemon.id).padStart(4, '0')}`;
     
     // Изображение покемона
     const imgUrl = pokemon.sprites.other?.home?.front_default || 
                  pokemon.sprites.other?.['official-artwork']?.front_default || 
                  pokemon.sprites.front_default;
-    document.getElementById('pokemonImage').src = imgUrl;
+    detailsElements.pokemonImage.src = imgUrl;
     
     // Типы покемона
-    const typesContainer = document.getElementById('typesContainer');
-
     const typesHTML = pokemon.types.map(t => {
         const type = t.type.name;
         return `
@@ -92,16 +91,15 @@ function displayPokemonDetails(pokemon, speciesData) {
         `;
       }).join('');
       
-      typesContainer.innerHTML = typesHTML;
+    detailsElements.typesContainer.innerHTML = typesHTML;
     
     // Основные характеристики
-    document.getElementById('pokemonHeight').textContent = `${pokemon.height / 10} m`;
-    document.getElementById('pokemonWeight').textContent = `${pokemon.weight / 10} kg`;
-    document.getElementById('pokemonBaseExp').textContent = pokemon.base_experience || 'Unknown';
+    detailsElements.pokemonHeight.textContent = `${pokemon.height / 10} m`;
+    detailsElements.pokemonWeight.textContent = `${pokemon.weight / 10} kg`;
+    detailsElements.pokemonBaseExp.textContent = pokemon.base_experience || 'Unknown';
     
     // Статистика
-    const statsContainer = document.getElementById('statsContainer');
-    statsContainer.innerHTML = pokemon.stats.map(stat => `
+    detailsElements.statsContainer.innerHTML = pokemon.stats.map(stat => `
         <div class="stat-item">
             <div class="stat-name">${stat.stat.name.replace('-', ' ')}</div>
             <div class="stat-bar-container">
@@ -112,8 +110,7 @@ function displayPokemonDetails(pokemon, speciesData) {
     `).join('');
     
     // Способности
-    const abilitiesContainer = document.getElementById('abilitiesContainer');
-    abilitiesContainer.innerHTML = pokemon.abilities.map(ability => `
+    detailsElements.abilitiesContainer.innerHTML = pokemon.abilities.map(ability => `
         <div class="ability-item">
             ${ability.ability.name.replace('-', ' ').charAt(0).toUpperCase() + 
              ability.ability.name.replace('-', ' ').slice(1)}

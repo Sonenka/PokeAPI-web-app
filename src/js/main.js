@@ -8,22 +8,7 @@ import '../css/loader.css';
 import '../css/media.css';
 
 import typeIcons from './dictionaries/typeIcons.js';
-
-const elements = {
-  listWrapper: document.querySelector(".list-wrapper"),
-  firstButton: document.getElementById("firstButton"),
-  prevButton: document.getElementById("prevButton"),
-  nextButton: document.getElementById("nextButton"),
-  lastButton: document.getElementById("lastButton"),
-  pageInput: document.getElementById("pageInput"),
-  pageInfo: document.getElementById("pageInfo"),
-  goButton: document.querySelector(".pagination__button--go"),
-  loader: document.querySelector(".loader-container"),
-  filterSelect: document.getElementById("filterSelect"),
-  sortSelect: document.getElementById("sortSelect"),
-  searchInput: document.getElementById("search__input"),
-  searchClear: document.getElementById("search__clear")
-};
+import { mainElements } from './dictionaries/elements.js';
 
 // Конфигурация
 const POKEMONS_PER_PAGE = 12;
@@ -35,14 +20,14 @@ let currentSort = 'id-asc';
 let currentFilterType = "";
 
 // Инициализация лоадера
-elements.loader.innerHTML = `
+mainElements.loader.innerHTML = `
   <div class="loader-container">
     <div class="o-pokeball u-tada"></div>
     <p class="loader-text">Pokémons are coming...</p>
   </div>
 `;
 
-document.body.appendChild(elements.loader);
+document.body.appendChild(mainElements.loader);
 
 
 // Инициализация приложения
@@ -59,14 +44,14 @@ async function initApp() {
       currentPage = state.currentPage;
       currentSort = state.currentSort;
       currentFilterType = state.currentFilterType;
-      elements.searchInput.value = state.searchTerm || '';
+      mainElements.searchInput.value = state.searchTerm || '';
       
       // Устанавливаем значения в селекторы
-      elements.sortSelect.value = currentSort;
-      elements.filterSelect.value = currentFilterType;
+      mainElements.sortSelect.value = currentSort;
+      mainElements.filterSelect.value = currentFilterType;
       
       // Показываем крестик очистки, если есть поисковый запрос
-      elements.searchClear.style.display = state.searchTerm ? 'block' : 'none';
+      mainElements.searchClear.style.display = state.searchTerm ? 'block' : 'none';
       
       // Загружаем всех покемонов
       await fetchAllPokemons();
@@ -94,7 +79,7 @@ async function initApp() {
       }
     } else {
       // Стандартная инициализация, если нет сохраненного состояния
-      elements.loader.style.display = "flex";
+      mainElements.loader.style.display = "flex";
       await fetchAllPokemons();
       sortPokemons();
       await loadPokemons();
@@ -105,7 +90,7 @@ async function initApp() {
   } catch (error) {
     console.error("Error initializing app:", error);
   } finally {
-    elements.loader.style.display = "none";
+    mainElements.loader.style.display = "none";
   }
 }
 
@@ -125,28 +110,28 @@ async function fetchTotalPokemonCount() {
 
 // Настройка обработчиков событий
 function setupEventListeners() {
-    elements.firstButton.addEventListener("click", () => loadPage(1));
-    elements.prevButton.addEventListener("click", () => loadPage(currentPage - 1));
-    elements.nextButton.addEventListener("click", () => loadPage(currentPage + 1));
-    elements.lastButton.addEventListener("click", () => loadPage(totalPages));
-    elements.goButton.addEventListener("click", handleGoButtonClick);
-    elements.pageInput.addEventListener("keypress", (e) => {
+    mainElements.firstButton.addEventListener("click", () => loadPage(1));
+    mainElements.prevButton.addEventListener("click", () => loadPage(currentPage - 1));
+    mainElements.nextButton.addEventListener("click", () => loadPage(currentPage + 1));
+    mainElements.lastButton.addEventListener("click", () => loadPage(totalPages));
+    mainElements.goButton.addEventListener("click", handleGoButtonClick);
+    mainElements.pageInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") handleGoButtonClick();
     });
     
-    elements.filterSelect.addEventListener("change", handleTypeFilterChange);
-    elements.searchInput.addEventListener("input", handleSearch);
-    elements.searchClear.addEventListener("click", clearSearch);
-    elements.sortSelect.addEventListener("change", () => {
-      currentSort = elements.sortSelect.value;
+    mainElements.filterSelect.addEventListener("change", handleTypeFilterChange);
+    mainElements.searchInput.addEventListener("input", handleSearch);
+    mainElements.searchClear.addEventListener("click", clearSearch);
+    mainElements.sortSelect.addEventListener("change", () => {
+      currentSort = mainElements.sortSelect.value;
       sortPokemons();
   });
   }
 
 async function loadPokemons() {
     try {
-      elements.listWrapper.innerHTML = "";
-      elements.loader.style.display = "flex";
+      mainElements.listWrapper.innerHTML = "";
+      mainElements.loader.style.display = "flex";
       
       // Определяем, какие покемоны загружать (все или отфильтрованные)
       const pokemonsToLoad = currentFilterType ? filteredPokemons : allPokemons;
@@ -168,14 +153,14 @@ async function loadPokemons() {
     } catch (error) {
       console.error("Error loading pokemons:", error);
     } finally {
-      elements.loader.style.display = "none";
+      mainElements.loader.style.display = "none";
     }
   }
   
 // Отображение покемонов
 function displayPokemons(pokemons, pokemonDataList) {
-    elements.listWrapper.innerHTML = "";
-    elements.listWrapper.style.opacity = "0"; // Скрываем, пока не загрузятся все картинки
+    mainElements.listWrapper.innerHTML = "";
+    mainElements.listWrapper.style.opacity = "0"; // Скрываем, пока не загрузятся все картинки
 
     const fragment = document.createDocumentFragment();
     const imageLoadPromises = [];
@@ -190,11 +175,11 @@ function displayPokemons(pokemons, pokemonDataList) {
         }
     });
 
-    elements.listWrapper.appendChild(fragment);
+    mainElements.listWrapper.appendChild(fragment);
 
     // Ждём, пока загрузятся ВСЕ картинки, потом показываем карточки
     Promise.all(imageLoadPromises).then(() => {
-        elements.listWrapper.style.opacity = "1";
+        mainElements.listWrapper.style.opacity = "1";
     });
 }
 
@@ -293,22 +278,22 @@ async function loadPage(page) {
   }
 
 function handleGoButtonClick() {
-  const page = parseInt(elements.pageInput.value, 10);
+  const page = parseInt(mainElements.pageInput.value, 10);
   if (!isNaN(page) && page >= 1 && page <= totalPages) {
     loadPage(page);
   } else {
-    elements.pageInput.value = currentPage;
+    mainElements.pageInput.value = currentPage;
   }
 }
 
 function updatePaginationUI() {
-  elements.pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  elements.pageInput.value = currentPage;
+  mainElements.pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  mainElements.pageInput.value = currentPage;
 
-  elements.firstButton.disabled = currentPage === 1;
-  elements.prevButton.disabled = currentPage === 1;
-  elements.nextButton.disabled = currentPage === totalPages;
-  elements.lastButton.disabled = currentPage === totalPages;
+  mainElements.firstButton.disabled = currentPage === 1;
+  mainElements.prevButton.disabled = currentPage === 1;
+  mainElements.nextButton.disabled = currentPage === totalPages;
+  mainElements.lastButton.disabled = currentPage === totalPages;
 }
 
 // Вспомогательные функции
@@ -317,7 +302,7 @@ function capitalizeFirstLetter(string) {
 }
 
 function handleSearch() {
-  const searchTerm = elements.searchInput.value.toLowerCase().trim();
+  const searchTerm = mainElements.searchInput.value.toLowerCase().trim();
 
   if (!searchTerm) {
     // Если строка поиска пустая, возвращаем стандартное отображение
@@ -327,15 +312,15 @@ function handleSearch() {
   }
 
   // Показываем или скрываем крестик
-  elements.searchClear.style.display = searchTerm ? "block" : "none";
+  mainElements.searchClear.style.display = searchTerm ? "block" : "none";
 }
 
 // Функция для сброса поиска и отображения всех покемонов
 function resetSearch() {
   filteredPokemons = [];
   currentPage = 1;
-  elements.searchInput.value = '';
-  elements.searchClear.style.display = 'none';
+  mainElements.searchInput.value = '';
+  mainElements.searchClear.style.display = 'none';
   loadPokemons();
   
   // Очищаем только поисковую часть состояния
@@ -366,15 +351,15 @@ function filterAndDisplayPokemons(searchTerm) {
 
 // Функция для отображения сообщения "No Pokémon found"
 function displayNoResultsMessage() {
-  elements.listWrapper.innerHTML = `
+  mainElements.listWrapper.innerHTML = `
     <div class="no-results">No Pokémon found</div>
   `;
 }
 
 // Отображение отфильтрованных покемонов
 async function displayFilteredPokemons() {
-  elements.listWrapper.innerHTML = "";
-  elements.loader.style.display = "flex";
+  mainElements.listWrapper.innerHTML = "";
+  mainElements.loader.style.display = "flex";
 
   try {
     const start = (currentPage - 1) * POKEMONS_PER_PAGE;
@@ -390,14 +375,14 @@ async function displayFilteredPokemons() {
   } catch (error) {
     console.error("Error displaying filtered pokemons:", error);
   } finally {
-    elements.loader.style.display = "none";
+    mainElements.loader.style.display = "none";
   }
 }
 
 // Функция для сброса поиска (если поисковая строка пуста)
 function clearSearch() {
-  elements.searchInput.value = '';
-  elements.searchClear.style.display = 'none';
+  mainElements.searchInput.value = '';
+  mainElements.searchClear.style.display = 'none';
   resetSearch();
 }
 
@@ -434,7 +419,7 @@ function sortPokemons() {
 
 
 async function handleTypeFilterChange() {
-  currentFilterType = elements.filterSelect.value;
+  currentFilterType = mainElements.filterSelect.value;
   
   // Сохраняем состояние перед изменением
   saveCurrentState();
@@ -451,15 +436,15 @@ function saveCurrentState() {
     currentPage,
     currentSort,
     currentFilterType,
-    searchTerm: elements.searchInput.value
+    searchTerm: mainElements.searchInput.value
   };
   localStorage.setItem('pokedexState', JSON.stringify(state));
 }
 
   async function filterPokemonsByType(type) {
     try {
-      elements.listWrapper.innerHTML = "";
-      elements.loader.style.display = "flex";
+      mainElements.listWrapper.innerHTML = "";
+      mainElements.loader.style.display = "flex";
       
       // Сначала получаем данные всех покемонов
       const pokemonDataList = await Promise.all(
@@ -494,7 +479,7 @@ function saveCurrentState() {
     } catch (error) {
       console.error("Error filtering pokemons by type:", error);
     } finally {
-      elements.loader.style.display = "none";
+      mainElements.loader.style.display = "none";
     }
   }
 
@@ -532,9 +517,9 @@ function openPokemonDetails(pokemonID) {
     currentPage,
     currentSort,
     currentFilterType,
-    searchTerm: elements.searchInput.value,
+    searchTerm: mainElements.searchInput.value,
     // Добавляем дополнительные параметры, если нужно
-    filteredPokemons: currentFilterType || elements.searchInput.value ? filteredPokemons : null
+    filteredPokemons: currentFilterType || mainElements.searchInput.value ? filteredPokemons : null
   };
   
   localStorage.setItem('pokedexState', JSON.stringify(state));
