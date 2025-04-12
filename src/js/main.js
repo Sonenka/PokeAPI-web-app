@@ -13,7 +13,8 @@ import { state } from './modules/state.js';
 import { POKEMONS_PER_PAGE, getPokemonIDFromURL, fetchPokemonData, fetchAllPokemons } from './modules/api.js'
 import { loadPokemons, displayFilteredPokemons, displayNoResultsMessage } from './modules/render.js';
 import { setupEventListeners } from './modules/handlers/events.js';
-import { resetSearch } from './modules/handlers/search.js';
+import { sortPokemons } from './modules/handlers/sort.js';
+import { saveCurrentState } from './modules/state.js';
 
 async function initApp() {
   try {
@@ -103,20 +104,6 @@ async function loadPage(page) {
     }
   }
 
-function sortPokemons() {
-    if (currentSort === 'id-asc') {
-        state.allPokemons.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
-    } else if (currentSort === 'id-desc') {
-        state.allPokemons.sort((a, b) => getPokemonIDFromURL(b.url) - getPokemonIDFromURL(a.url));
-    } else if (currentSort === 'name-asc') {
-        state.allPokemons.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (currentSort === 'name-desc') {
-        state.allPokemons.sort((a, b) => b.name.localeCompare(a.name));
-    }
-
-    loadPokemons(); // Перерисовываем список покемонов
-}
-
 export async function handleTypeFilterChange() {
   currentFilterType = mainElements.filterSelect.value;
   
@@ -130,15 +117,15 @@ export async function handleTypeFilterChange() {
   }
 }
 
-function saveCurrentState() {
-  const state = {
-    currentPage,
-    currentSort,
-    currentFilterType,
-    searchTerm: mainElements.searchInput.value
-  };
-  localStorage.setItem('pokedexState', JSON.stringify(state));
-}
+// function saveCurrentState() {
+//   const state = {
+//     currentPage,
+//     currentSort,
+//     currentFilterType,
+//     searchTerm: mainElements.searchInput.value
+//   };
+//   localStorage.setItem('pokedexState', JSON.stringify(state));
+// }
 
 async function filterPokemonsByType(type) {
   try {

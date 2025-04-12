@@ -7,3 +7,13 @@ export const state = {
     filterType: null,
     searchQuery: '',
   };
+  
+export function saveCurrentState() {
+    const stateToSave = {
+      currentPage: state.currentPage,
+      currentSort: state.sortOption,
+      currentFilterType: state.filterType,
+      searchTerm: state.searchQuery,
+    };
+    localStorage.setItem('pokedexState', JSON.stringify(stateToSave));
+}
