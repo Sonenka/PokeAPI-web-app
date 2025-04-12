@@ -12,6 +12,8 @@ import { mainElements } from './dictionaries/elements.js';
 import { state } from './modules/state.js';
 import { POKEMONS_PER_PAGE, getPokemonIDFromURL, fetchPokemonData, fetchAllPokemons } from './modules/api.js'
 import { loadPokemons, displayFilteredPokemons, displayNoResultsMessage } from './modules/render.js';
+import { setupEventListeners } from './modules/handlers/events.js';
+import { resetSearch } from './modules/handlers/search.js';
 
 async function initApp() {
   try {
@@ -88,26 +90,6 @@ async function fetchTotalPokemonCount() {
   }
 }
 
-// Настройка обработчиков событий
-function setupEventListeners() {
-    mainElements.firstButton.addEventListener("click", () => loadPage(1));
-    mainElements.prevButton.addEventListener("click", () => loadPage(currentPage - 1));
-    mainElements.nextButton.addEventListener("click", () => loadPage(currentPage + 1));
-    mainElements.lastButton.addEventListener("click", () => loadPage(state.totalPages));
-    mainElements.goButton.addEventListener("click", handleGoButtonClick);
-    mainElements.pageInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") handleGoButtonClick();
-    });
-    
-    mainElements.filterSelect.addEventListener("change", handleTypeFilterChange);
-    mainElements.searchInput.addEventListener("input", handleSearch);
-    mainElements.searchClear.addEventListener("click", clearSearch);
-    mainElements.sortSelect.addEventListener("change", () => {
-      currentSort = mainElements.sortSelect.value;
-      sortPokemons();
-  });
-  }
-
 async function loadPage(page) {
     page = Math.max(1, Math.min(page, state.totalPages));
     if (page === currentPage) return;
@@ -120,68 +102,6 @@ async function loadPage(page) {
       await loadPokemons();
     }
   }
-
-function handleGoButtonClick() {
-  const page = parseInt(mainElements.pageInput.value, 10);
-  if (!isNaN(page) && page >= 1 && page <= state.totalPages) {
-    loadPage(page);
-  } else {
-    mainElements.pageInput.value = currentPage;
-  }
-}
-
-function handleSearch() {
-  const searchTerm = mainElements.searchInput.value.toLowerCase().trim();
-
-  if (!searchTerm) {
-    // Если строка поиска пустая, возвращаем стандартное отображение
-    resetSearch();
-  } else {
-    filterAndDisplayPokemons(searchTerm);
-  }
-
-  // Показываем или скрываем крестик
-  mainElements.searchClear.style.display = searchTerm ? "block" : "none";
-}
-
-function resetSearch() {
-  filteredPokemons = [];
-  currentPage = 1;
-  mainElements.searchInput.value = '';
-  mainElements.searchClear.style.display = 'none';
-  loadPokemons();
-  
-  // Очищаем только поисковую часть состояния
-  const savedState = localStorage.getItem('pokedexState');
-  if (savedState) {
-    const state = JSON.parse(savedState);
-    state.searchTerm = '';
-    localStorage.setItem('pokedexState', JSON.stringify(state));
-  }
-}
-// Функция для фильтрации покемонов по поисковому запросу
-function filterAndDisplayPokemons(searchTerm) {
-  filteredPokemons = state.allPokemons.filter(pokemon => {
-    const pokemonID = getPokemonIDFromURL(pokemon.url).toString();
-    const pokemonName = pokemon.name.toLowerCase();
-    return pokemonID.includes(searchTerm) || pokemonName.includes(searchTerm);
-  });
-
-  state.totalPages = Math.ceil(filteredPokemons.length / POKEMONS_PER_PAGE);
-  currentPage = 1; 
-
-  if (filteredPokemons.length === 0) {
-    displayNoResultsMessage();
-  } else {
-    displayFilteredPokemons();
-  }
-}
-
-function clearSearch() {
-  mainElements.searchInput.value = '';
-  mainElements.searchClear.style.display = 'none';
-  resetSearch();
-}
 
 function sortPokemons() {
     if (currentSort === 'id-asc') {
@@ -197,7 +117,7 @@ function sortPokemons() {
     loadPokemons(); // Перерисовываем список покемонов
 }
 
-async function handleTypeFilterChange() {
+export async function handleTypeFilterChange() {
   currentFilterType = mainElements.filterSelect.value;
   
   // Сохраняем состояние перед изменением
