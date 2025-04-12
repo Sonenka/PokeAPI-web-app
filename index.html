@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
     <link rel="icon" href="/PokeAPI-web-app/favicon.png" type="image/x-icon">
-  <script type="module" crossorigin src="/PokeAPI-web-app/assets/main-L-1emzrU.js"></script>
-  <link rel="modulepreload" crossorigin href="/PokeAPI-web-app/assets/water-CcDrKTzB.js">
-  <link rel="stylesheet" crossorigin href="/PokeAPI-web-app/assets/water.qSrYY9Sb.css">
-  <link rel="stylesheet" crossorigin href="/PokeAPI-web-app/assets/main.DioQcU7m.css">
+  <script type="module" crossorigin src="/PokeAPI-web-app/assets/main-YHjOICXA.js"></script>
+  <link rel="modulepreload" crossorigin href="/PokeAPI-web-app/assets/water-Q0tGQRc_.js">
+  <link rel="stylesheet" crossorigin href="/PokeAPI-web-app/assets/water.C8cU_qj0.css">
+  <link rel="stylesheet" crossorigin href="/PokeAPI-web-app/assets/main.BQsFOkEm.css">
 </head>
 <body>
     <main class="main">
@@ -68,21 +68,23 @@
 
 
         <div class="pagination">
-            <div class="pagination__buttons">
+            <div class="pagination__buttons-left">
                 <button class="pagination__button button" id="firstButton">First</button>
                 <button class="pagination__button button" id="prevButton">Previous</button>
             </div>
-        
-            <div class="pagination__counter" id="pageInfo"></div>
+            
+            <div class="pagination__middle">
+                <div class="pagination__counter" id="pageInfo"></div>
 
-            <div class="pagination__input">
-                <input 
-                    type="number" 
-                    id="pageInput" 
-                    min="1" 
-                    value="1"
-                >
-                <button class="pagination__button button pagination__button--go">Go</button>
+                <div class="pagination__input">
+                    <input 
+                        type="number" 
+                        id="pageInput" 
+                        min="1" 
+                        value="1"
+                    >
+                    <button class="pagination__button button pagination__button--go">Go</button>
+                </div>
             </div>
             
             <div class="pagination__buttons">
