@@ -4,6 +4,48 @@ import '../css/style.css';
 import '../css/details.css';
 import '../css/card.css';
 
+import bug from '../assets/img/types/bug.svg';
+import dark from '../assets/img/types/dark.svg';
+import dragon from '../assets/img/types/dragon.svg';
+import electric from '../assets/img/types/electric.svg';
+import fire from '../assets/img/types/fire.svg';
+import fairy from '../assets/img/types/fairy.svg';
+import fighting from '../assets/img/types/fighting.svg';
+import flying from '../assets/img/types/flying.svg';
+import ghost from '../assets/img/types/ghost.svg';
+import grass from '../assets/img/types/grass.svg';
+import ground from '../assets/img/types/ground.svg';
+import ice from '../assets/img/types/ice.svg';
+import normal from '../assets/img/types/normal.svg';
+import poison from '../assets/img/types/poison.svg';
+import psychic from '../assets/img/types/psychic.svg';
+import rock from '../assets/img/types/rock.svg';
+import steel from '../assets/img/types/steel.svg';
+import water from '../assets/img/types/water.svg';
+
+const icons = {
+  bug,
+  dark,
+  dragon,
+  electric,
+  fire,
+  fairy,
+  fighting,
+  flying,
+  ghost,
+  grass,
+  ground,
+  ice,
+  normal,
+  poison,
+  psychic,
+  rock,
+  steel,
+  water,
+};
+
+console.log(icons.bug);
+
 // Получаем ID покемона из URL
 const pokemonID = new URLSearchParams(window.location.search).get('id') || 
                  localStorage.getItem('currentPokemonID');
@@ -79,13 +121,18 @@ function displayPokemonDetails(pokemon, speciesData) {
     
     // Типы покемона
     const typesContainer = document.getElementById('typesContainer');
-    typesContainer.innerHTML = pokemon.types.map(type => `
-        <div class="pokemon-type ${type.type.name}" 
-             style="background: ${getTypeColor(type.type.name)};">
-            <img src="img/types/${type.type.name}.svg" alt="${type.type.name}">
-            <span>${type.type.name.charAt(0).toUpperCase() + type.type.name.slice(1)}</span>
-        </div>
-    `).join('');
+
+    const typesHTML = pokemon.types.map(t => {
+        const type = t.type.name;
+        return `
+          <div class="card__type ${type}">
+            <img src="${icons[type]}" title="${type}" alt="${type}" />
+            <div>${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+          </div>
+        `;
+      }).join('');
+      
+      typesContainer.innerHTML = typesHTML;
     
     // Основные характеристики
     document.getElementById('pokemonHeight').textContent = `${pokemon.height / 10} m`;
@@ -151,7 +198,7 @@ function getPokemonColor(colorName) {
         pink: '#F85888',
         purple: '#7C538C',
         red: '#FA6555',
-        white: '#F8F8F8',
+        white: '#bfbfbf',
         yellow: '#F6C747'
     };
     return colorMap[colorName] || '#68A090'; // fallback цвет

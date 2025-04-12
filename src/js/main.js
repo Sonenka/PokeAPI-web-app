@@ -5,6 +5,7 @@ import '../css/pagination.css';
 import '../css/card.css';
 import '../css/search.css';
 import '../css/loader.css';
+import '../css/media.css';
 
 import bug from '../assets/img/types/bug.svg';
 import dark from '../assets/img/types/dark.svg';
@@ -151,7 +152,7 @@ async function fetchTotalPokemonCount() {
     const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=20000");
     const data = await response.json();
     
-    const filteredPokemons = data.results.filter(pokemon => getPokemonIDFromURL(pokemon.url) < 100000);
+    const filteredPokemons = data.results.filter(pokemon => getPokemonIDFromURL(pokemon.url) < 10000);
     totalPages = Math.ceil(filteredPokemons.length / POKEMONS_PER_PAGE);
     
     allPokemons = filteredPokemons;
@@ -550,7 +551,7 @@ function saveCurrentState() {
       // Фильтруем только покемонов с ID < 10000
       allPokemons = data.results.filter(pokemon => {
         const id = getPokemonIDFromURL(pokemon.url);
-        return id < 100000;
+        return id < 10000;
       });
       
       totalPages = Math.ceil(allPokemons.length / POKEMONS_PER_PAGE);
@@ -579,3 +580,4 @@ function openPokemonDetails(pokemonID) {
   
   window.location.href = `details.html?id=${pokemonID}`;
 }
+
