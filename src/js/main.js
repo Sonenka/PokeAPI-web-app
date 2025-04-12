@@ -7,7 +7,7 @@ import '../css/search.css';
 import '../css/loader.css';
 import '../css/media.css';
 
-import typeIcons from './typeIcons.js';
+import typeIcons from './dictionaries/typeIcons.js';
 
 const elements = {
   listWrapper: document.querySelector(".list-wrapper"),
