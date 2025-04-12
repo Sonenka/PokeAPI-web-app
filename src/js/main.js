@@ -7,11 +7,11 @@ import '../css/search.css';
 import '../css/loader.css';
 import '../css/media.css';
 
-import typeIcons from './dictionaries/typeIcons.js';
 import { mainElements } from './dictionaries/elements.js';
 
 import { state } from './modules/state.js';
 import { POKEMONS_PER_PAGE, getPokemonIDFromURL, fetchPokemonData, fetchAllPokemons } from './modules/api.js'
+import { loadPokemons } from './modules/render.js';
 
 async function initApp() {
   try {
@@ -108,122 +108,6 @@ function setupEventListeners() {
   });
   }
 
-async function loadPokemons() {
-    try {
-      mainElements.listWrapper.innerHTML = "";
-      mainElements.loader.style.display = "flex";
-      
-      // Определяем, какие покемоны загружать (все или отфильтрованные)
-      const pokemonsToLoad = currentFilterType ? filteredPokemons : state.allPokemons;
-      state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
-      
-      // Получаем покемонов для текущей страницы
-      const start = (currentPage - 1) * POKEMONS_PER_PAGE;
-      const end = start + POKEMONS_PER_PAGE;
-      const currentPagePokemons = pokemonsToLoad.slice(start, end);
-      
-      // Загружаем данные для каждого покемона
-      const pokemonDataList = await Promise.all(
-        currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-      );
-      
-      // Отображаем покемонов
-      displayPokemons(currentPagePokemons, pokemonDataList);
-      updatePaginationUI();
-    } catch (error) {
-      console.error("Error loading pokemons:", error);
-    } finally {
-      mainElements.loader.style.display = "none";
-    }
-  }
-
-function displayPokemons(pokemons, pokemonDataList) {
-    mainElements.listWrapper.innerHTML = "";
-    mainElements.listWrapper.style.opacity = "0"; // Скрываем, пока не загрузятся все картинки
-
-    const fragment = document.createDocumentFragment();
-    const imageLoadPromises = [];
-
-    pokemons.forEach((pokemon, index) => {
-        if (pokemonDataList[index]) {
-            const pokemonID = getPokemonIDFromURL(pokemon.url);
-            const { card, imageLoadPromise } = createPokemonCard(pokemon, pokemonID, pokemonDataList[index]);
-
-            imageLoadPromises.push(imageLoadPromise);
-            fragment.appendChild(card);
-        }
-    });
-
-    mainElements.listWrapper.appendChild(fragment);
-
-    // Ждём, пока загрузятся ВСЕ картинки, потом показываем карточки
-    Promise.all(imageLoadPromises).then(() => {
-        mainElements.listWrapper.style.opacity = "1";
-    });
-}
-
-function createPokemonCard(pokemon, pokemonID, pokemonData) {
-  if (!pokemonData) return document.createElement("div");
-
-  const card = document.createElement("div");
-  card.className = "card";
-  card.dataset.id = pokemonID; // Сохраняем ID в data-атрибуте
-
-  const types = pokemonData.types.map(type => type.type.name);
-  const typesHTML = types.map(type => `
-    <div class="card__type ${type}">
-      <img src="${typeIcons[type]}" title="${type}" alt="${type}" />
-      <div>${type}</div>
-    </div>
-  `).join('');
-
-  card.innerHTML = `
-    <div class="card__id">#${String(pokemonID).padStart(4, '0')}</div>
-    <div class="card__img"></div>
-    <div class="card__name">${capitalizeFirstLetter(pokemon.name)}</div>
-    <div class="card__types">${typesHTML}</div>
-  `;
-
-  // Гибридный выбор источника изображения
-  const getPokemonImage = (pokemonData, pokemonID) => {
-    if (pokemonData?.sprites) {
-      return pokemonData.sprites.other?.home?.front_default || 
-             pokemonData.sprites.other?.['official-artwork']?.front_default || 
-             pokemonData.sprites.front_default;
-    }
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonID}.png`;
-  };
-
-  const img = document.createElement("img");
-  img.src = getPokemonImage(pokemonData, pokemonID);
-  img.alt = pokemon.name;
-  img.loading = "lazy";
-
-  // Fallback-цепочка при ошибках загрузки
-  img.onerror = () => {
-    img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonID}.png`;
-    img.onerror = () => {
-      img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonID}.png`;
-    };
-  };
-
-  const imageLoadPromise = new Promise((resolve) => {
-    img.onload = () => {
-      img.classList.add('loaded');
-      resolve();
-    };
-    img.onerror = () => resolve(); // Разрешаем промис даже при ошибке
-  });
-
-  card.querySelector(".card__img").appendChild(img);
-
-  card.addEventListener("click", () => {
-    openPokemonDetails(pokemonID);
-  });
-
-  return { card, imageLoadPromise };
-}
-
 async function loadPage(page) {
     page = Math.max(1, Math.min(page, state.totalPages));
     if (page === currentPage) return;
@@ -246,17 +130,7 @@ function handleGoButtonClick() {
   }
 }
 
-function updatePaginationUI() {
-  mainElements.pageInfo.textContent = `Page ${currentPage} of ${state.totalPages}`;
-  mainElements.pageInput.value = currentPage;
-
-  mainElements.firstButton.disabled = currentPage === 1;
-  mainElements.prevButton.disabled = currentPage === 1;
-  mainElements.nextButton.disabled = currentPage === state.totalPages;
-  mainElements.lastButton.disabled = currentPage === state.totalPages;
-}
-
-function capitalizeFirstLetter(string) {
+export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
