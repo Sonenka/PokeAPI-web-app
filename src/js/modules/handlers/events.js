@@ -1,5 +1,5 @@
 import { mainElements } from "../../dictionaries/elements";
-import { handleTypeFilterChange } from "../../main";
+import { handleTypeFilterChange } from "./filter";
 import { handleSearch, clearSearch } from "./search";
 
 export function setupEventListeners() {

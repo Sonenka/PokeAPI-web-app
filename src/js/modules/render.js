@@ -33,7 +33,7 @@ export async function loadPokemons() {
     }
 }
 
-function displayPokemons(pokemons, pokemonDataList) {
+export function displayPokemons(pokemons, pokemonDataList) {
     mainElements.listWrapper.innerHTML = "";
     mainElements.listWrapper.style.opacity = "0"; // Скрываем, пока не загрузятся все картинки
 
@@ -58,7 +58,7 @@ function displayPokemons(pokemons, pokemonDataList) {
     });
 }
 
-function createPokemonCard(pokemon, pokemonID, pokemonData) {
+export function createPokemonCard(pokemon, pokemonID, pokemonData) {
   if (!pokemonData) return document.createElement("div");
 
   const card = document.createElement("div");
@@ -120,7 +120,7 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
   return { card, imageLoadPromise };
 }
 
-function updatePaginationUI() {
+export function updatePaginationUI() {
     mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
     mainElements.pageInput.value = state.currentPage;
   
