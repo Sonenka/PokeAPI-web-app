@@ -7,45 +7,7 @@ import '../css/search.css';
 import '../css/loader.css';
 import '../css/media.css';
 
-import bug from '../assets/img/types/bug.svg';
-import dark from '../assets/img/types/dark.svg';
-import dragon from '../assets/img/types/dragon.svg';
-import electric from '../assets/img/types/electric.svg';
-import fire from '../assets/img/types/fire.svg';
-import fairy from '../assets/img/types/fairy.svg';
-import fighting from '../assets/img/types/fighting.svg';
-import flying from '../assets/img/types/flying.svg';
-import ghost from '../assets/img/types/ghost.svg';
-import grass from '../assets/img/types/grass.svg';
-import ground from '../assets/img/types/ground.svg';
-import ice from '../assets/img/types/ice.svg';
-import normal from '../assets/img/types/normal.svg';
-import poison from '../assets/img/types/poison.svg';
-import psychic from '../assets/img/types/psychic.svg';
-import rock from '../assets/img/types/rock.svg';
-import steel from '../assets/img/types/steel.svg';
-import water from '../assets/img/types/water.svg';
-
-const icons = {
-  bug,
-  dark,
-  dragon,
-  electric,
-  fire,
-  fairy,
-  fighting,
-  flying,
-  ghost,
-  grass,
-  ground,
-  ice,
-  normal,
-  poison,
-  psychic,
-  rock,
-  steel,
-  water,
-};
+import typeIcons from './typeIcons.js';
 
 const elements = {
   listWrapper: document.querySelector(".list-wrapper"),
@@ -247,7 +209,7 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
   const types = pokemonData.types.map(type => type.type.name);
   const typesHTML = types.map(type => `
     <div class="card__type ${type}">
-      <img src="${icons[type]}" title="${type}" alt="${type}" />
+      <img src="${typeIcons[type]}" title="${type}" alt="${type}" />
       <div>${type}</div>
     </div>
   `).join('');

@@ -4,47 +4,7 @@ import '../css/style.css';
 import '../css/details.css';
 import '../css/card.css';
 
-import bug from '../assets/img/types/bug.svg';
-import dark from '../assets/img/types/dark.svg';
-import dragon from '../assets/img/types/dragon.svg';
-import electric from '../assets/img/types/electric.svg';
-import fire from '../assets/img/types/fire.svg';
-import fairy from '../assets/img/types/fairy.svg';
-import fighting from '../assets/img/types/fighting.svg';
-import flying from '../assets/img/types/flying.svg';
-import ghost from '../assets/img/types/ghost.svg';
-import grass from '../assets/img/types/grass.svg';
-import ground from '../assets/img/types/ground.svg';
-import ice from '../assets/img/types/ice.svg';
-import normal from '../assets/img/types/normal.svg';
-import poison from '../assets/img/types/poison.svg';
-import psychic from '../assets/img/types/psychic.svg';
-import rock from '../assets/img/types/rock.svg';
-import steel from '../assets/img/types/steel.svg';
-import water from '../assets/img/types/water.svg';
-
-const icons = {
-  bug,
-  dark,
-  dragon,
-  electric,
-  fire,
-  fairy,
-  fighting,
-  flying,
-  ghost,
-  grass,
-  ground,
-  ice,
-  normal,
-  poison,
-  psychic,
-  rock,
-  steel,
-  water,
-};
-
-console.log(icons.bug);
+import typeIcons from './typeIcons.js';
 
 // Получаем ID покемона из URL
 const pokemonID = new URLSearchParams(window.location.search).get('id') || 
@@ -126,7 +86,7 @@ function displayPokemonDetails(pokemon, speciesData) {
         const type = t.type.name;
         return `
           <div class="card__type ${type}">
-            <img src="${icons[type]}" title="${type}" alt="${type}" />
+            <img src="${typeIcons[type]}" title="${type}" alt="${type}" />
             <div>${type.charAt(0).toUpperCase() + type.slice(1)}</div>
           </div>
         `;
