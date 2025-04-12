@@ -1,6 +1,8 @@
 import { mainElements } from "../../dictionaries/elements";
 import { handleTypeFilterChange } from "./filter";
 import { handleSearch, clearSearch } from "./search";
+import { state } from "../state";
+import { sortPokemons } from "./sort";
 
 export function setupEventListeners() {
     mainElements.firstButton.addEventListener("click", () => loadPage(1));
@@ -16,7 +18,7 @@ export function setupEventListeners() {
     mainElements.searchInput.addEventListener("input", handleSearch);
     mainElements.searchClear.addEventListener("click", clearSearch);
     mainElements.sortSelect.addEventListener("change", () => {
-      currentSort = mainElements.sortSelect.value;
+      state.currentSort = mainElements.sortSelect.value;
       sortPokemons();
   });
 }

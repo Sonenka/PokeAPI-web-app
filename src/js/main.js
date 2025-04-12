@@ -10,16 +10,23 @@ import '../css/media.css';
 import { mainElements } from './dictionaries/elements.js';
 
 // import { openPokemonDetails, state, saveCurrentState } from './modules/state.js';
-import { POKEMONS_PER_PAGE, getPokemonIDFromURL, fetchAllPokemons } from './modules/api.js'
-import { loadPokemons, displayFilteredPokemons } from './modules/render.js';
+import { fetchAllPokemons } from './modules/api.js'
 import { setupEventListeners } from './modules/handlers/events.js';
 import { sortPokemons } from './modules/handlers/sort.js';
 import { filterPokemonsByType } from './modules/handlers/filter.js';
 import { state } from './modules/state.js';
+import { resetTypeFilter } from './modules/handlers/filter.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  mainElements.filterSelect.value = "";
-});
+
+
+mainElements.loader.innerHTML = `
+  <div class="loader-container">
+    <div class="o-pokeball u-tada"></div>
+    <p class="loader-text">Pokémons are coming...</p>
+  </div>
+`;
+
+document.body.appendChild(mainElements.loader);
 
 async function initApp() {
   try {
@@ -68,15 +75,5 @@ async function initApp() {
     mainElements.loader.style.display = "none";
   }
 }
-
-
-mainElements.loader.innerHTML = `
-  <div class="loader-container">
-    <div class="o-pokeball u-tada"></div>
-    <p class="loader-text">Pokémons are coming...</p>
-  </div>
-`;
-
-document.body.appendChild(mainElements.loader);
 
 initApp()

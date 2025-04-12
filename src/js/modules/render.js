@@ -142,9 +142,9 @@ export async function displayFilteredPokemons() {
     mainElements.loader.style.display = "flex";
   
     try {
-      const start = (currentPage - 1) * POKEMONS_PER_PAGE;
+      const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
       const end = start + POKEMONS_PER_PAGE;
-      const pokemonsToLoad = filteredPokemons.slice(start, end);
+      const pokemonsToLoad = state.filteredPokemons.slice(start, end);
   
       const pokemonDataList = await Promise.all(
         pokemonsToLoad.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
