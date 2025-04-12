@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
     <link rel="icon" href="/PokeAPI-web-app/favicon.png" type="image/x-icon">
-  <script type="module" crossorigin src="/PokeAPI-web-app/assets/main-1eyxUbTR.js"></script>
-  <link rel="modulepreload" crossorigin href="/PokeAPI-web-app/assets/typeIcons-Cr3LCB7A.js">
+  <script type="module" crossorigin src="/PokeAPI-web-app/assets/main-B3lJoe-p.js"></script>
+  <link rel="modulepreload" crossorigin href="/PokeAPI-web-app/assets/typeIcons-wyGrPWsT.js">
   <link rel="stylesheet" crossorigin href="/PokeAPI-web-app/assets/typeIcons.C8cU_qj0.css">
   <link rel="stylesheet" crossorigin href="/PokeAPI-web-app/assets/main.BdOVArwm.css">
 </head>
@@ -19,7 +19,7 @@
             </div>
 
             <div class="dropdown">
-                <label class="dropdown__label" for="dropdownSelect">Sort by:</label>
+                <div class="dropdown__label">Sort by:</div>
                 <div class="dropdown__container">
                     <select class="dropdown__select" id="sortSelect">
                         <option class="dropdown__option" value="id-asc">ID (Ascending)</option>
@@ -32,10 +32,10 @@
             
         
             <div class="dropdown">
-                <label class="dropdown__label" for="filterSelect">Filter by Type:</label>
+                <div class="dropdown__label">Filter by Type:</div>
                 <div class="dropdown__container">
                     <select class="dropdown__select" id="filterSelect">
-                        <option class="dropdown__option" value="">All Types</option>
+                        <option class="dropdown__option" value="" selected>All Types</option>
                         <option class="dropdown__option" value="bug">Bug</option>
                         <option class="dropdown__option" value="dark">Dark</option>
                         <option class="dropdown__option" value="dragon">Dragon</option>
