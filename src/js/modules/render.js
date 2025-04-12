@@ -2,7 +2,7 @@ import { mainElements } from '../dictionaries/elements.js';
 import { state } from './state.js';
 import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.js'
 import typeIcons from '../dictionaries/typeIcons.js';
-import { capitalizeFirstLetter } from '../main.js';
+import { capitalizeFirstLetter } from './utils.js';
 
 export async function loadPokemons() {
     try {

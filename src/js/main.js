@@ -130,10 +130,6 @@ function handleGoButtonClick() {
   }
 }
 
-export function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 function handleSearch() {
   const searchTerm = mainElements.searchInput.value.toLowerCase().trim();
 
