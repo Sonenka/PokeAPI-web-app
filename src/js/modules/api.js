@@ -12,6 +12,8 @@ export async function fetchAllPokemons() {
       return id < 10000;
     });
     
+    console.log("Pokemons loaded:", state.allPokemons); // Выводим загруженные покемоны
+
     state.totalPages = Math.ceil(state.allPokemons.length / POKEMONS_PER_PAGE);
   } catch (error) {
     console.error("Error fetching all pokemons:", error);
@@ -32,4 +34,18 @@ export async function fetchPokemonData(id) {
 export function getPokemonIDFromURL(url) {
     const segments = url.split("/").filter(Boolean);
     return parseInt(segments[segments.length - 1], 10);
+}
+
+export async function fetchTotalPokemonCount() {
+  try {
+    const response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=11000");
+    const data = await response.json();
+    
+    const filteredPokemons = data.results.filter(pokemon => getPokemonIDFromURL(pokemon.url) < 10000);
+    state.totalPages = Math.ceil(filteredPokemons.length / POKEMONS_PER_PAGE);
+    
+    state.allPokemons = filteredPokemons;
+  } catch (error) {
+    console.error("Error fetching total Pokémon count:", error);
+  }
 }

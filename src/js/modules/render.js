@@ -3,35 +3,42 @@ import { state } from './state.js';
 import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.js'
 import typeIcons from '../dictionaries/typeIcons.js';
 import { capitalizeFirstLetter } from './utils.js';
+import { openPokemonDetails } from './state.js';
 
 export async function loadPokemons() {
-    try {
-      mainElements.listWrapper.innerHTML = "";
-      mainElements.loader.style.display = "flex";
-      
-      // Определяем, какие покемоны загружать (все или отфильтрованные)
-      const pokemonsToLoad = state.currentFilterType ? filteredPokemons : state.allPokemons;
-      state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
-      
-      // Получаем покемонов для текущей страницы
-      const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
-      const end = start + POKEMONS_PER_PAGE;
-      const currentPagePokemons = pokemonsToLoad.slice(start, end);
-      
-      // Загружаем данные для каждого покемона
-      const pokemonDataList = await Promise.all(
-        currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-      );
-      
-      // Отображаем покемонов
-      displayPokemons(currentPagePokemons, pokemonDataList);
-      updatePaginationUI();
-    } catch (error) {
-      console.error("Error loading pokemons:", error);
-    } finally {
-      mainElements.loader.style.display = "none";
-    }
+  try {
+    mainElements.listWrapper.innerHTML = "";
+    mainElements.loader.style.display = "flex";
+
+    // Определяем, какие покемоны загружать (все или отфильтрованные)
+    const pokemonsToLoad = state.currentFilterType ? state.filteredPokemons : state.allPokemons;
+    console.log("Pokemons to load:", pokemonsToLoad); // Логируем, какие покемоны будут загружены
+
+    state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
+    console.log("Total pages:", state.totalPages); // Логируем общее количество страниц
+
+    // Получаем покемонов для текущей страницы
+    const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
+    const end = start + POKEMONS_PER_PAGE;
+    const currentPagePokemons = pokemonsToLoad.slice(start, end);
+
+    console.log("Current page pokemons:", currentPagePokemons); // Логируем покемонов для текущей страницы
+
+    // Загружаем данные для каждого покемона
+    const pokemonDataList = await Promise.all(
+      currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+    );
+
+    // Отображаем покемонов
+    displayPokemons(currentPagePokemons, pokemonDataList);
+    updatePaginationUI();
+  } catch (error) {
+    console.error("Error loading pokemons:", error);
+  } finally {
+    mainElements.loader.style.display = "none";
+  }
 }
+
 
 export function displayPokemons(pokemons, pokemonDataList) {
     mainElements.listWrapper.innerHTML = "";
@@ -156,4 +163,17 @@ export function displayNoResultsMessage() {
   mainElements.listWrapper.innerHTML = `
     <div class="no-results">No Pokémon found</div>
   `;
+}
+
+export async function loadPage(page) {
+  page = Math.max(1, Math.min(page, state.totalPages));
+  if (page === state.currentPage) return;
+
+  state.currentPage = page;
+
+  if (state.currentFilterType) {
+    await filterPokemonsByType(state.currentFilterType);
+  } else {
+    await loadPokemons();
+  }
 }
