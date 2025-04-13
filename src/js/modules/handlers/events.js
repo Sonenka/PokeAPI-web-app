@@ -20,10 +20,19 @@ export function setupEventListeners() {
     mainElements.filterSelect.addEventListener("change", handleTypeFilterChange);
     mainElements.searchInput.addEventListener("input", handleSearch);
     mainElements.searchClear.addEventListener("click", clearSearch);
-    mainElements.sortSelect.addEventListener("change", () => {
-      state.currentSort = mainElements.sortSelect.value;
-      sortPokemons();
-  });
+    mainElements.sortSelect.addEventListener('change', () => {
+      state.sortOption = mainElements.sortSelect.value;
+      sortPokemons(); // Используем единую функцию сортировки
+      
+      // Сохраняем состояние
+      const stateToSave = {
+        currentPage: state.currentPage,
+        currentSort: state.sortOption,
+        currentFilterType: state.currentFilterType,
+        searchTerm: state.searchTerm
+      };
+      localStorage.setItem('pokedexState', JSON.stringify(stateToSave));
+    });
 }
 
 function handleGoButtonClick() {

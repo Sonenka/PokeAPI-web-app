@@ -43,7 +43,7 @@ export async function handleTypeFilterChange() {
         state.currentFilterType = type;
         
         // Применяем текущую сортировку к отфильтрованным покемонам
-        applyCurrentSort();
+        // applyCurrentSort();
       }
       
       // Всегда сбрасываем на первую страницу при фильтрации
@@ -66,36 +66,27 @@ export function resetTypeFilter() {
     state.filteredPokemons = [...state.allPokemons];
     
     // Применяем текущую сортировку
-    applyCurrentSort();
+    // applyCurrentSort();
     
     state.currentPage = 1;
     loadPokemons();
   }
 
-export function applyCurrentSort() {
-    const pokemonsToSort = state.filteredPokemons.length > 0 
-        ? state.filteredPokemons 
-        : state.allPokemons;
-
-    switch(state.sortOption) {
-        case 'id-asc':
-            pokemonsToSort.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
-            break;
-        case 'id-desc':
-            pokemonsToSort.sort((a, b) => getPokemonIDFromURL(b.url) - getPokemonIDFromURL(a.url));
-            break;
-        case 'name-asc':
-            pokemonsToSort.sort((a, b) => a.name.localeCompare(b.name));
-            break;
-        case 'name-desc':
-            pokemonsToSort.sort((a, b) => b.name.localeCompare(a.name));
-            break;
-    }
-
-    // Обновляем соответствующий массив
-    if (state.filteredPokemons.length > 0) {
-        state.filteredPokemons = pokemonsToSort;
-    } else {
-        state.allPokemons = pokemonsToSort;
-    }
-}
+  // export function applyCurrentSort() {
+  //   const arrayToSort = state.currentDisplay;
+    
+  //   switch(state.sortOption) {
+  //     case 'id-asc':
+  //       arrayToSort.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
+  //       break;
+  //     case 'id-desc':
+  //       arrayToSort.sort((a, b) => getPokemonIDFromURL(b.url) - getPokemonIDFromURL(a.url));
+  //       break;
+  //     case 'name-asc':
+  //       arrayToSort.sort((a, b) => a.name.localeCompare(b.name));
+  //       break;
+  //     case 'name-desc':
+  //       arrayToSort.sort((a, b) => b.name.localeCompare(a.name));
+  //       break;
+  //   }
+  // }

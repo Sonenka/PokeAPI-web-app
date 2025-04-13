@@ -1,7 +1,7 @@
 import { mainElements } from '../dictionaries/elements.js';
 import typeIcons from '../dictionaries/typeIcons.js';
 
-import { applyCurrentSort } from './handlers/filter.js';
+// import { applyCurrentSort } from './handlers/filter.js';
 
 import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.js'
 import { state, openPokemonDetails } from './state.js';
@@ -9,19 +9,20 @@ import { capitalizeFirstLetter } from './utils.js';
 
 export async function loadPokemons() {
   try {
+    mainElements.listWrapper.innerHTML = "";
     mainElements.loader.style.display = "flex";
-    
+
     // Определяем какие покемоны показывать
-    const pokemonsToShow = (state.searchTerm || state.currentFilterType)
-      ? state.filteredPokemons
+    const pokemonsToLoad = state.filteredPokemons.length > 0 
+      ? state.filteredPokemons 
       : state.allPokemons;
 
     // Пагинация
-    state.totalPages = Math.ceil(pokemonsToShow.length / POKEMONS_PER_PAGE);
+    state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
     state.currentPage = Math.min(state.currentPage, state.totalPages || 1);
 
     // Получаем данные для текущей страницы
-    const pagePokemons = pokemonsToShow.slice(
+    const pagePokemons = pokemonsToLoad.slice(
       (state.currentPage - 1) * POKEMONS_PER_PAGE,
       state.currentPage * POKEMONS_PER_PAGE
     );
@@ -34,6 +35,7 @@ export async function loadPokemons() {
     
   } finally {
     mainElements.loader.style.display = "none";
+    updatePaginationUI();
   }
 }
 

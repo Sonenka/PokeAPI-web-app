@@ -1,13 +1,13 @@
 import { mainElements } from "../dictionaries/elements";
 
 export const state = {
-    allPokemons: [],
-    filteredPokemons: [],
-    currentPage: 1,
-    itemsPerPage: 12,
-    sortOption: 'id-asc',
-    currentFilterType: "",
-    searchTerm: '',
+  allPokemons: [],         // Все покемоны (исходный список)
+  filteredPokemons: [],    // Результаты фильтрации/поиска
+  currentPage: 1,
+  itemsPerPage: 12,
+  sortOption: 'id-asc',
+  currentFilterType: "",
+  searchTerm: '',
 };
 
 export function openPokemonDetails(pokemonID) {

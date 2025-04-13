@@ -1,6 +1,6 @@
 import { mainElements } from "../../dictionaries/elements";
 
-import { applyCurrentSort } from "./filter";
+// import { applyCurrentSort } from "./filter";
 
 import { getPokemonIDFromURL, POKEMONS_PER_PAGE, fetchPokemonData } from "../api";
 import { displayNoResultsMessage, displayFilteredPokemons, loadPokemons } from "../render";
@@ -21,20 +21,19 @@ export function handleSearch() {
 }
 
 function filterAndDisplayPokemons(searchTerm) {
-  // Базовый список - либо уже отфильтрованные по типу, либо все
+  // Базовый список - либо отфильтрованные по типу, либо все
   const basePokemons = state.currentFilterType 
-    ? state.filteredPokemons.length > 0 
-      ? state.filteredPokemons 
-      : state.allPokemons.filter(p => checkPokemonType(p, state.currentFilterType))
+    ? state.typeFiltered 
     : state.allPokemons;
 
   // Применяем поиск
-  state.filteredPokemons = basePokemons.filter(pokemon => {
+  state.searchFiltered = basePokemons.filter(pokemon => {
     const pokemonID = getPokemonIDFromURL(pokemon.url).toString();
     const pokemonName = pokemon.name.toLowerCase();
     return pokemonID.includes(searchTerm) || pokemonName.includes(searchTerm);
   });
 
+  state.currentDisplay = state.searchFiltered;
   updateAfterFilter();
 }
 
@@ -54,24 +53,10 @@ async function resetSearch() {
   mainElements.searchInput.value = '';
   mainElements.searchClear.style.display = 'none';
 
-  // Если есть активный фильтр по типу - применяем его
-  if (state.currentFilterType) {
-    state.filteredPokemons = state.allPokemons.filter(pokemon => {
-      // Используем кешированные данные о типах
-      const pokemonId = getPokemonIDFromURL(pokemon.url);
-      if (typeCache.has(pokemonId)) {
-        return typeCache.get(pokemonId).includes(state.currentFilterType);
-      }
-      // Если нет в кеше - временно включаем, потом обновим
-      return true;
-    });
-    
-    // Догружаем данные для покемонов, которых нет в кеше
-    await loadMissingTypeData();
-  } else {
-    // Если фильтра нет - показываем всех покемонов
-    state.filteredPokemons = [...state.allPokemons];
-  }
+  // Определяем что отображать
+  state.currentDisplay = state.currentFilterType 
+    ? state.typeFiltered 
+    : state.allPokemons;
 
   // Применяем сортировку и обновляем UI
   applyCurrentSort();
