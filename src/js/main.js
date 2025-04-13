@@ -18,15 +18,6 @@ import { fetchAllPokemons } from './modules/api.js'
 import { loadPokemons } from './modules/render.js';
 import { state } from './modules/state.js';
 
-mainElements.loader.innerHTML = `
-  <div class="loader-container">
-    <div class="o-pokeball u-tada"></div>
-    <p class="loader-text">Pokémons are coming...</p>
-  </div>
-`;
-
-document.body.appendChild(mainElements.loader);
-
 async function initApp() {
   try {
     mainElements.loader.style.display = "flex";
