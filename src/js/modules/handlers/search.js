@@ -1,115 +1,98 @@
 import { mainElements } from "../../dictionaries/elements";
-
-// import { applyCurrentSort } from "./filter";
-
 import { getPokemonIDFromURL, POKEMONS_PER_PAGE, fetchPokemonData } from "../api";
 import { displayNoResultsMessage, displayFilteredPokemons, loadPokemons } from "../render";
 import { state } from "../state";
+
+// Инициализация поиска
+export function initSearch() {
+  if (mainElements.searchInput) {
+    mainElements.searchInput.addEventListener("input", handleSearch);
+    mainElements.searchInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") handleSearch();
+    });
+  }
+  
+  if (mainElements.searchClear) {
+    mainElements.searchClear.addEventListener("click", clearSearch);
+    mainElements.searchClear.style.display = "none";
+  }
+}
 
 export function handleSearch() {
   const searchTerm = mainElements.searchInput.value.toLowerCase().trim();
   state.searchTerm = searchTerm;
 
-  mainElements.searchClear.style.display = searchTerm ? "block" : "none";
+  // Показываем/скрываем кнопку очистки
+  if (mainElements.searchClear) {
+    mainElements.searchClear.style.display = searchTerm ? "block" : "none";
+  }
 
-  // Всегда обновляем отображение при любом изменении поиска
   if (searchTerm) {
-    filterAndDisplayPokemons(searchTerm);
+    filterBySearch(searchTerm);
   } else {
     resetSearch();
   }
 }
 
-function filterAndDisplayPokemons(searchTerm) {
-  // Базовый список - либо отфильтрованные по типу, либо все
+function filterBySearch(searchTerm) {
+  // Базовый список - либо отфильтрованные по типу, либо все покемоны
   const basePokemons = state.currentFilterType 
     ? state.typeFiltered 
     : state.allPokemons;
 
-  // Применяем поиск
-  state.searchFiltered = basePokemons.filter(pokemon => {
+  // Фильтруем по поисковому запросу
+  const searchResults = basePokemons.filter(pokemon => {
     const pokemonID = getPokemonIDFromURL(pokemon.url).toString();
     const pokemonName = pokemon.name.toLowerCase();
     return pokemonID.includes(searchTerm) || pokemonName.includes(searchTerm);
   });
 
-  state.currentDisplay = state.searchFiltered;
-  updateAfterFilter();
+  // Обновляем состояние
+  state.currentDisplay = searchResults;
+  state.filteredPokemons = searchResults; // Добавим для совместимости
+  updateDisplayAfterSearch();
 }
 
-function updateAfterFilter() {
-  state.totalPages = Math.ceil(state.filteredPokemons.length / POKEMONS_PER_PAGE);
+function updateDisplayAfterSearch() {
+  state.totalPages = Math.ceil(state.currentDisplay.length / POKEMONS_PER_PAGE);
   state.currentPage = 1;
 
-  if (state.filteredPokemons.length === 0) {
+  if (state.currentDisplay.length === 0) {
     displayNoResultsMessage();
   } else {
     displayFilteredPokemons();
   }
 }
 
-async function resetSearch() {
-  state.searchTerm = '';
-  mainElements.searchInput.value = '';
-  mainElements.searchClear.style.display = 'none';
+export function clearSearch() {
+  if (mainElements.searchInput) {
+    mainElements.searchInput.value = "";
+  }
+  
+  if (mainElements.searchClear) {
+    mainElements.searchClear.style.display = "none";
+  }
+  
+  resetSearch();
+  
+  // Анимация для плавности
+  if (mainElements.listWrapper) {
+    mainElements.listWrapper.style.opacity = "0";
+    setTimeout(() => {
+      mainElements.listWrapper.style.opacity = "1";
+    }, 150);
+  }
+}
 
-  // Определяем что отображать
+function resetSearch() {
+  state.searchTerm = "";
+  
+  // Возвращаемся к базовому списку
   state.currentDisplay = state.currentFilterType 
     ? state.typeFiltered 
     : state.allPokemons;
-
-  // Применяем сортировку и обновляем UI
-  applyCurrentSort();
+  
+  // Обновляем отображение
   state.currentPage = 1;
   loadPokemons();
-}
-
-const typeCache = new Map(); // Кеш для хранения типов покемонов
-
-async function checkPokemonType(pokemon, type) {
-  const pokemonId = getPokemonIDFromURL(pokemon.url);
-  
-  // Проверяем кеш
-  if (!typeCache.has(pokemonId)) {
-    const pokemonData = await fetchPokemonData(pokemonId);
-    typeCache.set(pokemonId, pokemonData?.types.map(t => t.type.name) || []);
-  }
-  
-  return typeCache.get(pokemonId).includes(type);
-}
-
-export function clearSearch() {
-  // Полностью сбрасываем поиск
-  mainElements.searchInput.value = '';
-  mainElements.searchClear.style.display = 'none';
-  
-  // Вызываем resetSearch с forceUpdate
-  resetSearch();
-  
-  // Добавляем анимацию для визуального отклика
-  mainElements.listWrapper.style.opacity = '0';
-  setTimeout(() => {
-    mainElements.listWrapper.style.opacity = '1';
-  }, 150);
-}
-
-async function loadMissingTypeData() {
-  // Находим покемонов без данных о типах
-  const pokemonsToLoad = state.filteredPokemons.filter(pokemon => {
-    const id = getPokemonIDFromURL(pokemon.url);
-    return !typeCache.has(id);
-  });
-
-  // Параллельно загружаем данные
-  await Promise.all(pokemonsToLoad.map(async pokemon => {
-    const id = getPokemonIDFromURL(pokemon.url);
-    const data = await fetchPokemonData(id);
-    typeCache.set(id, data.types.map(t => t.type.name));
-  }));
-
-  // Повторно фильтруем с актуальными данными
-  state.filteredPokemons = state.filteredPokemons.filter(pokemon => {
-    const id = getPokemonIDFromURL(pokemon.url);
-    return typeCache.get(id)?.includes(state.currentFilterType);
-  });
 }
