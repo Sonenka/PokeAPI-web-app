@@ -8,10 +8,21 @@ import { loadPage } from "../render";
 import { state } from "../state";
 
 export function setupEventListeners() {
-    mainElements.firstButton.addEventListener("click", () => loadPage(1));
-    mainElements.prevButton.addEventListener("click", () => loadPage(state.currentPage - 1));
-    mainElements.nextButton.addEventListener("click", () => loadPage(state.currentPage + 1));
-    mainElements.lastButton.addEventListener("click", () => loadPage(state.totalPages));
+  document.querySelectorAll(".firstButton").forEach(button => {
+    button.addEventListener("click", () => loadPage(1));
+});
+
+document.querySelectorAll(".prevButton").forEach(button => {
+    button.addEventListener("click", () => loadPage(state.currentPage - 1));
+});
+
+document.querySelectorAll(".nextButton").forEach(button => {
+    button.addEventListener("click", () => loadPage(state.currentPage + 1));
+});
+
+document.querySelectorAll(".lastButton").forEach(button => {
+    button.addEventListener("click", () => loadPage(state.totalPages));
+});
     mainElements.goButton.addEventListener("click", handleGoButtonClick);
     mainElements.pageInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") handleGoButtonClick();

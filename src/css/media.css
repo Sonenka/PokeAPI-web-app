@@ -31,7 +31,6 @@
     }
 
     .pagination__input input {
-        width: 60px;
         font-size: 14px;
     }
 
@@ -53,6 +52,10 @@
     }
 
     .pagination__input {
+        gap: 10px;
+    }
+
+    .pagination__middle {
         gap: 10px;
     }
 
@@ -125,9 +128,43 @@
         padding: 15px;
     }
 
-    #lastButton,
-    #firstButton {
+    .pagination {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        height: auto;
+    }
+
+    .pagination__buttons-mobile {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .pagination__button {
+        font-size: 12px;
+        width: 23%;
+    }
+
+    .pagination__buttons-left,
+    .pagination__buttons-right {
         display: none;
+    }
+
+    .pagination__input {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    } 
+
+    .pagination__button--go {
+        width: 100%;
+    }
+
+    .pagination__input input {
+        width: 100%;
     }
 
 }
@@ -191,15 +228,6 @@
     .pagination__buttons-left,
     .pagination__buttons-right {
         display: none;
-    }
-
-    .pagination__middle {
-        order: 2; 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        width: 100%;
     }
 
     .pagination__input {
