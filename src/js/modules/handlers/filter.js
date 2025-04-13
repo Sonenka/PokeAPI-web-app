@@ -1,6 +1,7 @@
 import { mainElements } from "../../dictionaries/elements";
-import { fetchPokemonData, getPokemonIDFromURL, POKEMONS_PER_PAGE } from "../api";
-import { displayNoResultsMessage, displayPokemons, updatePaginationUI, loadPokemons } from "../render";
+
+import { fetchPokemonData, getPokemonIDFromURL } from "../api";
+import { loadPokemons } from "../render";
 import { state } from "../state";
 
 export async function handleTypeFilterChange() {

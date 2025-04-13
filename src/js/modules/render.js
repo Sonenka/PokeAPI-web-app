@@ -1,11 +1,11 @@
 import { mainElements } from '../dictionaries/elements.js';
-import { state } from './state.js';
-import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.js'
 import typeIcons from '../dictionaries/typeIcons.js';
-import { capitalizeFirstLetter } from './utils.js';
-import { openPokemonDetails } from './state.js';
-import { filterPokemonsByType } from './handlers/filter.js';
+
 import { applyCurrentSort } from './handlers/filter.js';
+
+import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.js'
+import { state, openPokemonDetails } from './state.js';
+import { capitalizeFirstLetter } from './utils.js';
 
 export async function loadPokemons() {
   try {
@@ -45,7 +45,7 @@ export async function loadPokemons() {
 }
 
 
-export function displayPokemons(pokemons, pokemonDataList) {
+function displayPokemons(pokemons, pokemonDataList) {
     mainElements.listWrapper.innerHTML = "";
     mainElements.listWrapper.style.opacity = "0"; // Скрываем, пока не загрузятся все картинки
 
@@ -70,7 +70,7 @@ export function displayPokemons(pokemons, pokemonDataList) {
     });
 }
 
-export function createPokemonCard(pokemon, pokemonID, pokemonData) {
+function createPokemonCard(pokemon, pokemonID, pokemonData) {
   if (!pokemonData) return document.createElement("div");
 
   const card = document.createElement("div");
@@ -132,7 +132,7 @@ export function createPokemonCard(pokemon, pokemonID, pokemonData) {
   return { card, imageLoadPromise };
 }
 
-export function updatePaginationUI() {
+function updatePaginationUI() {
   mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
   mainElements.pageInput.value = state.currentPage;
 

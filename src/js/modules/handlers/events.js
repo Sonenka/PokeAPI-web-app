@@ -1,9 +1,11 @@
 import { mainElements } from "../../dictionaries/elements";
+
 import { handleTypeFilterChange } from "./filter";
 import { handleSearch, clearSearch } from "./search";
-import { state } from "../state";
 import { sortPokemons } from "./sort";
+
 import { loadPage } from "../render";
+import { state } from "../state";
 
 export function setupEventListeners() {
     mainElements.firstButton.addEventListener("click", () => loadPage(1));

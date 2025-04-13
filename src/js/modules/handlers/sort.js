@@ -1,7 +1,8 @@
-import { state } from "../state";
-import { loadPokemons } from "../render";
-import { getPokemonIDFromURL } from "../api";
 import { mainElements } from "../../dictionaries/elements";
+
+import { getPokemonIDFromURL } from "../api";
+import { loadPokemons } from "../render";
+import { state } from "../state";
 
 export function sortPokemons() {
     const sortOption = mainElements.sortSelect.value;

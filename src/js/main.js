@@ -9,15 +9,12 @@ import '../css/media.css';
 
 import { mainElements } from './dictionaries/elements.js';
 
-// import { openPokemonDetails, state, saveCurrentState } from './modules/state.js';
-import { fetchAllPokemons } from './modules/api.js'
 import { setupEventListeners } from './modules/handlers/events.js';
+import { filterPokemonsByType, resetTypeFilter } from './modules/handlers/filter.js';
 import { sortPokemons } from './modules/handlers/sort.js';
-import { filterPokemonsByType } from './modules/handlers/filter.js';
+
+import { fetchAllPokemons } from './modules/api.js'
 import { state } from './modules/state.js';
-import { resetTypeFilter } from './modules/handlers/filter.js';
-
-
 
 mainElements.loader.innerHTML = `
   <div class="loader-container">

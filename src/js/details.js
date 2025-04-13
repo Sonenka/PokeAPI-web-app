@@ -4,8 +4,8 @@ import '../css/style.css';
 import '../css/details.css';
 import '../css/card.css';
 
-import typeIcons from './dictionaries/typeIcons.js';
 import { detailsElements } from './dictionaries/elements.js';
+import typeIcons from './dictionaries/typeIcons.js';
 
 // Получаем ID покемона из URL
 const pokemonID = new URLSearchParams(window.location.search).get('id') || 

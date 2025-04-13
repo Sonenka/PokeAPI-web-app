@@ -1,10 +1,8 @@
 import { mainElements } from "../../dictionaries/elements";
+
+import { getPokemonIDFromURL, POKEMONS_PER_PAGE } from "../api";
+import { displayNoResultsMessage, displayFilteredPokemons, loadPokemons } from "../render";
 import { state } from "../state";
-import { getPokemonIDFromURL } from "../api";
-import { POKEMONS_PER_PAGE } from "../api";
-import { displayNoResultsMessage } from "../render";
-import { displayFilteredPokemons } from "../render";
-import { loadPokemons } from "../render";
 
 export function handleSearch() {
   const searchTerm = mainElements.searchInput.value.toLowerCase().trim();
@@ -21,7 +19,7 @@ export function handleSearch() {
   mainElements.searchClear.style.display = searchTerm ? "block" : "none";
 }
 
-export function filterAndDisplayPokemons(searchTerm) {
+function filterAndDisplayPokemons(searchTerm) {
   state.filteredPokemons = state.allPokemons.filter(pokemon => {
       const pokemonID = getPokemonIDFromURL(pokemon.url).toString();
       const pokemonName = pokemon.name.toLowerCase();
@@ -38,7 +36,7 @@ export function filterAndDisplayPokemons(searchTerm) {
   }
 }
 
-export function resetSearch() {
+function resetSearch() {
   // Восстанавливаем полный список покемонов
   state.filteredPokemons = [...state.allPokemons];
   state.searchTerm = '';
