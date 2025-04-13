@@ -131,10 +131,16 @@ function updatePaginationUI() {
   mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
   mainElements.pageInput.value = state.currentPage;
 
-  mainElements.firstButton.disabled = state.currentPage === 1;
-  mainElements.prevButton.disabled = state.currentPage === 1;
-  mainElements.nextButton.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
-  mainElements.lastButton.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
+  // Обновляем состояние всех кнопок (и десктопных и мобильных)
+  document.querySelectorAll(".firstButton, .prevButton").forEach(button => {
+      button.disabled = state.currentPage === 1;
+      button.classList.toggle("disabled", state.currentPage === 1);
+  });
+
+  document.querySelectorAll(".nextButton, .lastButton").forEach(button => {
+      button.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
+      button.classList.toggle("disabled", state.currentPage === state.totalPages || state.totalPages === 0);
+  });
 }
 
 export async function displayFilteredPokemons() {
