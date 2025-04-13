@@ -9,36 +9,29 @@ import { capitalizeFirstLetter } from './utils.js';
 
 export async function loadPokemons() {
   try {
-    mainElements.listWrapper.innerHTML = "";
     mainElements.loader.style.display = "flex";
-
-    // Убедимся, что сортировка применена
-    applyCurrentSort();
-
-    // Выбираем какие покемоны загружать
-    const pokemonsToLoad = state.filteredPokemons.length > 0 
-        ? state.filteredPokemons 
-        : state.allPokemons;
-
-    state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
     
-    // Корректируем текущую страницу
-    if (state.currentPage > state.totalPages && state.totalPages > 0) {
-      state.currentPage = state.totalPages;
-    }
+    // Определяем какие покемоны показывать
+    const pokemonsToShow = (state.searchTerm || state.currentFilterType)
+      ? state.filteredPokemons
+      : state.allPokemons;
 
-    const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
-    const end = start + POKEMONS_PER_PAGE;
-    const currentPagePokemons = pokemonsToLoad.slice(start, end);
+    // Пагинация
+    state.totalPages = Math.ceil(pokemonsToShow.length / POKEMONS_PER_PAGE);
+    state.currentPage = Math.min(state.currentPage, state.totalPages || 1);
 
-    const pokemonDataList = await Promise.all(
-      currentPagePokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+    // Получаем данные для текущей страницы
+    const pagePokemons = pokemonsToShow.slice(
+      (state.currentPage - 1) * POKEMONS_PER_PAGE,
+      state.currentPage * POKEMONS_PER_PAGE
     );
 
-    displayPokemons(currentPagePokemons, pokemonDataList);
-    updatePaginationUI();
-  } catch (error) {
-    console.error("Error loading pokemons:", error);
+    // Отображаем
+    const pokemonData = await Promise.all(
+      pagePokemons.map(p => fetchPokemonData(getPokemonIDFromURL(p.url)))
+    );
+    displayPokemons(pagePokemons, pokemonData);
+    
   } finally {
     mainElements.loader.style.display = "none";
   }
@@ -178,4 +171,16 @@ export async function loadPage(page) {
 
   // Всегда используем loadPokemons, который сам решит, какие данные загружать
   await loadPokemons();
+}
+
+export function syncUIWithState() {
+  // Синхронизируем фильтр
+  mainElements.filterSelect.value = state.currentFilterType || '';
+  
+  // Синхронизируем поиск
+  mainElements.searchInput.value = state.searchTerm || '';
+  mainElements.searchClear.style.display = state.searchTerm ? 'block' : 'none';
+  
+  // Синхронизируем сортировку
+  mainElements.sortSelect.value = state.sortOption;
 }
