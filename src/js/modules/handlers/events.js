@@ -12,12 +12,6 @@ export function setupEventListeners() {
     mainElements.prevButton.addEventListener("click", () => loadPage(state.currentPage - 1));
     mainElements.nextButton.addEventListener("click", () => loadPage(state.currentPage + 1));
     mainElements.lastButton.addEventListener("click", () => loadPage(state.totalPages));
-
-    mainElements.mobileFirstButton.addEventListener("click", () => loadPage(1));
-    mainElements.mobilePrevButton.addEventListener("click", () => loadPage(state.currentPage - 1));
-    mainElements.mobileNextButton.addEventListener("click", () => loadPage(state.currentPage + 1));
-    mainElements.mobileLastButton.addEventListener("click", () => loadPage(state.totalPages));
-    
     mainElements.goButton.addEventListener("click", handleGoButtonClick);
     mainElements.pageInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") handleGoButtonClick();

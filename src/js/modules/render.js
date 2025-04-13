@@ -126,43 +126,13 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
 }
 
 function updatePaginationUI() {
-  // Обновляем информацию о странице
   mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
   mainElements.pageInput.value = state.currentPage;
-  
-  // Десктопные кнопки
+
   mainElements.firstButton.disabled = state.currentPage === 1;
   mainElements.prevButton.disabled = state.currentPage === 1;
-  mainElements.nextButton.disabled = state.currentPage === state.totalPages;
-  mainElements.lastButton.disabled = state.currentPage === state.totalPages;
-  
-  // Мобильные кнопки
-  mainElements.mobileFirstButton.disabled = state.currentPage === 1;
-  mainElements.mobilePrevButton.disabled = state.currentPage === 1;
-  mainElements.mobileNextButton.disabled = state.currentPage === state.totalPages;
-  mainElements.mobileLastButton.disabled = state.currentPage === state.totalPages;
-  
-  // Добавляем/удаляем классы для стилизации
-  const allButtons = [
-      mainElements.firstButton,
-      mainElements.prevButton,
-      mainElements.nextButton,
-      mainElements.lastButton,
-      mainElements.mobileFirstButton,
-      mainElements.mobilePrevButton,
-      mainElements.mobileNextButton,
-      mainElements.mobileLastButton
-  ];
-  
-  allButtons.forEach(btn => {
-      if (btn.disabled) {
-          btn.classList.add('disabled');
-          btn.setAttribute('aria-disabled', 'true');
-      } else {
-          btn.classList.remove('disabled');
-          btn.setAttribute('aria-disabled', 'false');
-      }
-  });
+  mainElements.nextButton.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
+  mainElements.lastButton.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
 }
 
 export async function displayFilteredPokemons() {
