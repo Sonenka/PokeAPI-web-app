@@ -40,6 +40,9 @@ export async function handleTypeFilterChange() {
           return pokemonData && pokemonData.types.some(t => t.type.name === type);
         });
         state.currentFilterType = type;
+        
+        // Применяем текущую сортировку к отфильтрованным покемонам
+        applyCurrentSort();
       }
       
       // Всегда сбрасываем на первую страницу при фильтрации
@@ -57,9 +60,41 @@ export async function handleTypeFilterChange() {
   
 
 export function resetTypeFilter() {
-  console.log("Resetting type filter, showing all pokemons.");
-  state.currentFilterType = "";
-  state.filteredPokemons = [...state.allPokemons];  // Показываем всех покемонов
-  state.currentPage = 1;
-  loadPokemons();
+    console.log("Resetting type filter, showing all pokemons.");
+    state.currentFilterType = "";
+    state.filteredPokemons = [...state.allPokemons];
+    
+    // Применяем текущую сортировку
+    applyCurrentSort();
+    
+    state.currentPage = 1;
+    loadPokemons();
+  }
+
+export function applyCurrentSort() {
+    const pokemonsToSort = state.filteredPokemons.length > 0 
+        ? state.filteredPokemons 
+        : state.allPokemons;
+
+    switch(state.sortOption) {
+        case 'id-asc':
+            pokemonsToSort.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
+            break;
+        case 'id-desc':
+            pokemonsToSort.sort((a, b) => getPokemonIDFromURL(b.url) - getPokemonIDFromURL(a.url));
+            break;
+        case 'name-asc':
+            pokemonsToSort.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 'name-desc':
+            pokemonsToSort.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+    }
+
+    // Обновляем соответствующий массив
+    if (state.filteredPokemons.length > 0) {
+        state.filteredPokemons = pokemonsToSort;
+    } else {
+        state.allPokemons = pokemonsToSort;
+    }
 }

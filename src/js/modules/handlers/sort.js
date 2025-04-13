@@ -1,17 +1,41 @@
 import { state } from "../state";
 import { loadPokemons } from "../render";
 import { getPokemonIDFromURL } from "../api";
+import { mainElements } from "../../dictionaries/elements";
 
 export function sortPokemons() {
-    if (state.currentSort === 'id-asc') {
-        state.allPokemons.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
-    } else if (state.currentSort === 'id-desc') {
-        state.allPokemons.sort((a, b) => getPokemonIDFromURL(b.url) - getPokemonIDFromURL(a.url));
-    } else if (state.currentSort === 'name-asc') {
-        state.allPokemons.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (state.currentSort === 'name-desc') {
-        state.allPokemons.sort((a, b) => b.name.localeCompare(a.name));
+    const sortOption = mainElements.sortSelect.value;
+    state.sortOption = sortOption;
+
+    // Определяем, какие покемоны сортировать (отфильтрованные или все)
+    const pokemonsToSort = state.filteredPokemons.length > 0 
+        ? state.filteredPokemons 
+        : state.allPokemons;
+
+    // Применяем сортировку
+    switch(sortOption) {
+        case 'id-asc':
+            pokemonsToSort.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
+            break;
+        case 'id-desc':
+            pokemonsToSort.sort((a, b) => getPokemonIDFromURL(b.url) - getPokemonIDFromURL(a.url));
+            break;
+        case 'name-asc':
+            pokemonsToSort.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 'name-desc':
+            pokemonsToSort.sort((a, b) => b.name.localeCompare(a.name));
+            break;
     }
+
+    // Обновляем соответствующий массив
+    if (state.filteredPokemons.length > 0) {
+        state.filteredPokemons = pokemonsToSort;
+    } else {
+        state.allPokemons = pokemonsToSort;
+    }
+
+    // Сбрасываем на первую страницу и перезагружаем
     state.currentPage = 1;
-    loadPokemons(); // Перерисовываем список покемонов
+    loadPokemons();
 }

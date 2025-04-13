@@ -5,19 +5,24 @@ import typeIcons from '../dictionaries/typeIcons.js';
 import { capitalizeFirstLetter } from './utils.js';
 import { openPokemonDetails } from './state.js';
 import { filterPokemonsByType } from './handlers/filter.js';
+import { applyCurrentSort } from './handlers/filter.js';
 
 export async function loadPokemons() {
   try {
     mainElements.listWrapper.innerHTML = "";
     mainElements.loader.style.display = "flex";
 
-    // Всегда используем filteredPokemons, если они есть (даже если пустые)
-    const pokemonsToLoad = state.filteredPokemons.length > 0 ? state.filteredPokemons : state.allPokemons;
-    
-    // Пересчитываем общее количество страниц
+    // Убедимся, что сортировка применена
+    applyCurrentSort();
+
+    // Выбираем какие покемоны загружать
+    const pokemonsToLoad = state.filteredPokemons.length > 0 
+        ? state.filteredPokemons 
+        : state.allPokemons;
+
     state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
     
-    // Корректируем текущую страницу, если она выходит за пределы
+    // Корректируем текущую страницу
     if (state.currentPage > state.totalPages && state.totalPages > 0) {
       state.currentPage = state.totalPages;
     }
