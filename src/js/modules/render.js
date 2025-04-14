@@ -1,48 +1,52 @@
 import { mainElements } from '../dictionaries/elements.js';
 import typeIcons from '../dictionaries/typeIcons.js';
 
-// import { applyCurrentSort } from './handlers/filter.js';
-
 import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.js'
 import { state, openPokemonDetails } from './state.js';
-import { capitalizeFirstLetter } from './utils.js';
+import { capitalizeFirstLetter, toggleLoader } from './utils.js';
 
 export async function loadPokemons() {
-  try {
-    mainElements.listWrapper.innerHTML = "";
-    mainElements.loader.style.display = "flex";
+    try {
+        mainElements.listWrapper.innerHTML = "";
+        toggleLoader(true);
 
-    // Определяем какие покемоны показывать
-    const pokemonsToLoad = state.filteredPokemons.length > 0 
-      ? state.filteredPokemons 
-      : state.allPokemons;
+        const pokemonsToLoad = state.filteredPokemons.length > 0 
+            ? state.filteredPokemons 
+            : state.allPokemons;
 
-    // Пагинация
-    state.totalPages = Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE);
-    state.currentPage = Math.min(state.currentPage, state.totalPages || 1);
+        state.totalPages = Math.max(1, Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE));
+        state.currentPage = Math.max(1, Math.min(state.currentPage, state.totalPages));
 
-    // Получаем данные для текущей страницы
-    const pagePokemons = pokemonsToLoad.slice(
-      (state.currentPage - 1) * POKEMONS_PER_PAGE,
-      state.currentPage * POKEMONS_PER_PAGE
-    );
+        // данные текущей страницы
+        const pagePokemons = pokemonsToLoad.slice(
+            (state.currentPage - 1) * POKEMONS_PER_PAGE,
+            state.currentPage * POKEMONS_PER_PAGE
+        );
 
-    // Отображаем
-    const pokemonData = await Promise.all(
-      pagePokemons.map(p => fetchPokemonData(getPokemonIDFromURL(p.url)))
-    );
-    displayPokemons(pagePokemons, pokemonData);
-    
-  } finally {
-    mainElements.loader.style.display = "none";
-    updatePaginationUI();
-  }
+        const pokemonData = await Promise.all(
+            pagePokemons.map(async pokemon => {
+                try {
+                    return await fetchPokemonData(getPokemonIDFromURL(pokemon.url));
+                } catch (error) {
+                    console.error(`Failed to load pokemon ${pokemon.name}:`, error);
+                    return null;
+                }
+            })
+        );
+        
+        await displayPokemons(pagePokemons, pokemonData); 
+    } catch {
+      console.error("Error loading pokemons:", error);
+      displayErrorState();
+    } finally {
+        toggleLoader(false);
+        updatePaginationUI();
+    }
 }
-
 
 function displayPokemons(pokemons, pokemonDataList) {
     mainElements.listWrapper.innerHTML = "";
-    mainElements.listWrapper.style.opacity = "0"; // Скрываем, пока не загрузятся все картинки
+    mainElements.listWrapper.style.opacity = "0"; // cкрываем, пока не загрузятся все картинки
 
     const fragment = document.createDocumentFragment();
     const imageLoadPromises = [];
@@ -59,79 +63,69 @@ function displayPokemons(pokemons, pokemonDataList) {
 
     mainElements.listWrapper.appendChild(fragment);
 
-    // Ждём, пока загрузятся ВСЕ картинки, потом показываем карточки
+    // ждём, пока загрузятся ВСЕ картинки, потом показываем карточки
     Promise.all(imageLoadPromises).then(() => {
         mainElements.listWrapper.style.opacity = "1";
     });
 }
 
 function createPokemonCard(pokemon, pokemonID, pokemonData) {
-  if (!pokemonData) return document.createElement("div");
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.id = pokemonID;
 
-  const card = document.createElement("div");
-  card.className = "card";
-  card.dataset.id = pokemonID; // Сохраняем ID в data-атрибуте
+    const types = pokemonData?.types?.map(type => type.type.name) || [];
+    const typesHTML = types.map(type => `
+      <div class="card__type ${type}">
+        <img src="${typeIcons[type]}" title="${type}" alt="${type}" />
+        <div>${type}</div>
+      </div>
+    `).join('');
 
-  const types = pokemonData.types.map(type => type.type.name);
-  const typesHTML = types.map(type => `
-    <div class="card__type ${type}">
-      <img src="${typeIcons[type]}" title="${type}" alt="${type}" />
-      <div>${type}</div>
-    </div>
-  `).join('');
+    card.innerHTML = `
+      <div class="card__id">#${String(pokemonID).padStart(4, '0')}</div>
+      <div class="card__img"></div>
+      <div class="card__name">${capitalizeFirstLetter(pokemon.name)}</div>
+      <div class="card__types">${typesHTML}</div>
+    `;
 
-  card.innerHTML = `
-    <div class="card__id">#${String(pokemonID).padStart(4, '0')}</div>
-    <div class="card__img"></div>
-    <div class="card__name">${capitalizeFirstLetter(pokemon.name)}</div>
-    <div class="card__types">${typesHTML}</div>
-  `;
-
-  // Гибридный выбор источника изображения
-  const getPokemonImage = (pokemonData, pokemonID) => {
-    if (pokemonData?.sprites) {
-      return pokemonData.sprites.other?.home?.front_default || 
-             pokemonData.sprites.other?.['official-artwork']?.front_default || 
-             pokemonData.sprites.front_default;
-    }
-    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonID}.png`;
-  };
-
-  const img = document.createElement("img");
-  img.src = getPokemonImage(pokemonData, pokemonID);
-  img.alt = pokemon.name;
-  img.loading = "lazy";
-
-  // Fallback-цепочка при ошибках загрузки
-  img.onerror = () => {
-    img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonID}.png`;
-    img.onerror = () => {
-      img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonID}.png`;
+    // гибридный выбор источника изображения
+    const getPokemonImage = (pokemonData, pokemonID) => {
+      if (pokemonData?.sprites) {
+        return pokemonData.sprites.other?.home?.front_default || 
+              pokemonData.sprites.other?.['official-artwork']?.front_default || 
+              pokemonData.sprites.front_default;
+      }
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonID}.png`;
     };
-  };
 
-  const imageLoadPromise = new Promise((resolve) => {
-    img.onload = () => {
-      img.classList.add('loaded');
-      resolve();
-    };
-    img.onerror = () => resolve(); // Разрешаем промис даже при ошибке
-  });
+    const img = document.createElement("img");
+    img.src = getPokemonImage(pokemonData, pokemonID);
+    img.alt = pokemon.name;
+    img.loading = "lazy";
 
-  card.querySelector(".card__img").appendChild(img);
+    const imageLoadPromise = new Promise((resolve) => {
+        img.onload = () => {
+            img.classList.add('loaded');
+            resolve();
+        };
 
-  card.addEventListener("click", () => {
-    openPokemonDetails(pokemonID);
-  });
+        img.onerror = () => resolve(); // разрешаем промис даже при ошибке
+    });
 
-  return { card, imageLoadPromise };
+    card.querySelector(".card__img").appendChild(img);
+
+    card.addEventListener("click", () => {
+      openPokemonDetails(pokemonID);
+    });
+
+    return { card, imageLoadPromise };
 }
 
 function updatePaginationUI() {
   mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
   mainElements.pageInput.value = state.currentPage;
 
-  // Обновляем состояние всех кнопок (и десктопных и мобильных)
   document.querySelectorAll(".firstButton, .prevButton").forEach(button => {
       button.disabled = state.currentPage === 1;
       button.classList.toggle("disabled", state.currentPage === 1);
@@ -145,7 +139,7 @@ function updatePaginationUI() {
 
 export async function displayFilteredPokemons() {
     mainElements.listWrapper.innerHTML = "";
-    mainElements.loader.style.display = "flex";
+    toggleLoader(true);
   
     try {
       const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
@@ -157,11 +151,11 @@ export async function displayFilteredPokemons() {
       );
   
       displayPokemons(pokemonsToLoad, pokemonDataList);
-      updatePaginationUI(); // Обновляем пагинацию после поиска
+      updatePaginationUI();
     } catch (error) {
       console.error("Error displaying filtered pokemons:", error);
     } finally {
-      mainElements.loader.style.display = "none";
+      toggleLoader(false);
     }
 }
 
@@ -177,18 +171,16 @@ export async function loadPage(page) {
 
   state.currentPage = page;
 
-  // Всегда используем loadPokemons, который сам решит, какие данные загружать
   await loadPokemons();
 }
 
-export function syncUIWithState() {
-  // Синхронизируем фильтр
-  mainElements.filterSelect.value = state.currentFilterType || '';
+function displayErrorState() {
+  mainElements.listWrapper.innerHTML = `
+      <div class="error-state">
+          <p>Failed to load Pokémon data</p>
+          <button class="retry-button">Try Again</button>
+      </div>
+  `;
   
-  // Синхронизируем поиск
-  mainElements.searchInput.value = state.searchTerm || '';
-  mainElements.searchClear.style.display = state.searchTerm ? 'block' : 'none';
-  
-  // Синхронизируем сортировку
-  mainElements.sortSelect.value = state.sortOption;
+  mainElements.listWrapper.querySelector(".retry-button")?.addEventListener("click", loadPokemons);
 }

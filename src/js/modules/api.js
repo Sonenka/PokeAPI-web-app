@@ -20,11 +20,11 @@ export async function fetchAllPokemons() {
 
 export async function fetchPokemonData(id) {
     try {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-      return await response.json();
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        return await response.json();
     } catch (error) {
-      console.error(`Failed to fetch Pokemon data for ID ${id}:`, error);
-      return null;
+        console.error(`Failed to fetch Pokemon data for ID ${id}:`, error);
+        return null;
     }
 }
 
@@ -33,7 +33,7 @@ export function getPokemonIDFromURL(url) {
         const segments = url.split("/").filter(Boolean);
         return parseInt(segments[segments.length - 1], 10);
     } catch (error) {
-      console.error(`Error parsing Pokemon URL: ${url}`, error);
-      return null;
+        console.error(`Error parsing Pokemon URL: ${url}`, error);
+        return null;
     }
 }
