@@ -7,41 +7,41 @@
     <link rel="icon" href="/favicon.png" type="image/x-icon">
     <script type="module" src="./src/js/details.js" defer></script>
 </head>
-<body>
-    <div class="details-container">
-        <div class="details-header">
-            <button id="backButton" class="back-button">← Back to Pokedex</button>
-            <h1 id="pokemonName"></h1>
-            <div id="pokemonID" class="pokemon-id"></div>
+<body class="page">
+    <div class="details">
+        <div class="details__header">
+            <button id="backButton" class="details__back-button">←</button>
+            <h1 class="details__title" id="pokemonName"></h1>
+            <div id="pokemonID" class="details__id"></div>
         </div>
         
-        <div class="details-main">
-            <div class="pokemon-image-container">
-                <img id="pokemonImage" class="pokemon-image" src="" alt="">
-                <div class="types-container" id="typesContainer"></div>
+        <div class="details__main">
+            <div class="details__image-container">
+                <img id="pokemonImage" class="details__image" src="" alt="">
+                <div class="details__types" id="typesContainer"></div>
             </div>
             
-            <div class="pokemon-info">
-                <div class="info-section">
-                    <h2>General Info</h2>
-                    <div class="info-grid">
-                        <div>Height:</div>
-                        <div id="pokemonHeight"></div>
-                        <div>Weight:</div>
-                        <div id="pokemonWeight"></div>
-                        <div>Base Experience:</div>
-                        <div id="pokemonBaseExp"></div>
+            <div class="details__info">
+                <div class="details__section">
+                    <h2 class="details__subtitle">General Info</h2>
+                    <div class="details__grid">
+                        <div class="details__label">Height:</div>
+                        <div class="details__value" id="pokemonHeight"></div>
+                        <div class="details__label">Weight:</div>
+                        <div class="details__value" id="pokemonWeight"></div>
+                        <div class="details__label">Base Experience:</div>
+                        <div class="details__value" id="pokemonBaseExp"></div>
                     </div>
                 </div>
                 
-                <div class="info-section">
-                    <h2>Stats</h2>
-                    <div class="stats-container" id="statsContainer"></div>
+                <div class="details__section">
+                    <h2 class="details__subtitle">Stats</h2>
+                    <div class="details__stats" id="statsContainer"></div>
                 </div>
                 
-                <div class="info-section">
-                    <h2>Abilities</h2>
-                    <div class="abilities-container" id="abilitiesContainer"></div>
+                <div class="details__section">
+                    <h2 class="details__subtitle">Abilities</h2>
+                    <div class="details__abilities" id="abilitiesContainer"></div>
                 </div>
             </div>
         </div>

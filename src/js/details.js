@@ -100,21 +100,21 @@ function displayPokemonDetails(pokemon, speciesData) {
     
     // Статистика
     detailsElements.statsContainer.innerHTML = pokemon.stats.map(stat => `
-        <div class="stat-item">
-            <div class="stat-name">${stat.stat.name.replace('-', ' ')}</div>
-            <div class="stat-bar-container">
-                <div class="stat-bar" style="width: ${Math.min(100, stat.base_stat)}%"></div>
-                <div class="stat-value">${stat.base_stat}</div>
+        <div class="details__stat">
+            <div class="details__stat-name">${stat.stat.name.replace('-', ' ')}</div>
+            <div class="details__stat-bar-container">
+                <div class="details__stat-bar" style="width: ${Math.min(100, stat.base_stat)}%"></div>
+                <div class="details__stat-value">${stat.base_stat}</div>
             </div>
         </div>
     `).join('');
     
     // Способности
     detailsElements.abilitiesContainer.innerHTML = pokemon.abilities.map(ability => `
-        <div class="ability-item">
+        <div class="details__ability">
             ${ability.ability.name.replace('-', ' ').charAt(0).toUpperCase() + 
              ability.ability.name.replace('-', ' ').slice(1)}
-            ${ability.is_hidden ? '<span class="hidden-ability">(hidden)</span>' : ''}
+            ${ability.is_hidden ? '<span class="details__ability--hidden">(hidden)</span>' : ''}
         </div>
     `).join('');
 }

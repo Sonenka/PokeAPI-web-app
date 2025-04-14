@@ -81,9 +81,8 @@ export async function filterPokemonsByType(type) {
   
 export function resetTypeFilter() {
     state.currentFilterType = "";
-    state.typeFiltered = [...state.allPokemons]; // Сброс фильтра
+    state.typeFiltered = [...state.allPokemons]; 
     
-    // Важно: сохраняем поиск если он был активен
     if (state.searchTerm) {
         // Пересчитываем searchResults по всем покемонам
         state.searchResults = state.allPokemons.filter(pokemon => {
@@ -92,8 +91,6 @@ export function resetTypeFilter() {
             return pokemonID.includes(state.searchTerm) || pokemonName.includes(state.searchTerm);
         });
     }
-
-    
     
     updateCurrentDisplay(); // Обновляем currentDisplay
     state.currentPage = 1;
