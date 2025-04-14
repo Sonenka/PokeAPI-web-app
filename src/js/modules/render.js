@@ -76,27 +76,27 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
 
     const types = pokemonData?.types?.map(type => type.type.name) || [];
     const typesHTML = types.map(type => `
-      <div class="card__type ${type}">
-        <img src="${typeIcons[type]}" title="${type}" alt="${type}" />
-        <div>${type}</div>
-      </div>
+        <div class="card__type ${type}">
+            <img src="${typeIcons[type]}" title="${type}" alt="${type}" />
+            <div>${type}</div>
+        </div>
     `).join('');
 
     card.innerHTML = `
-      <div class="card__id">#${String(pokemonID).padStart(4, '0')}</div>
-      <div class="card__img"></div>
-      <div class="card__name">${capitalizeFirstLetter(pokemon.name)}</div>
-      <div class="card__types">${typesHTML}</div>
+        <div class="card__id">#${String(pokemonID).padStart(4, '0')}</div>
+        <div class="card__img"></div>
+        <div class="card__name">${capitalizeFirstLetter(pokemon.name)}</div>
+        <div class="card__types">${typesHTML}</div>
     `;
 
     // гибридный выбор источника изображения
     const getPokemonImage = (pokemonData, pokemonID) => {
-      if (pokemonData?.sprites) {
-        return pokemonData.sprites.other?.home?.front_default || 
-              pokemonData.sprites.other?.['official-artwork']?.front_default || 
-              pokemonData.sprites.front_default;
-      }
-      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonID}.png`;
+        if (pokemonData?.sprites) {
+            return pokemonData.sprites.other?.home?.front_default || 
+                  pokemonData.sprites.other?.['official-artwork']?.front_default || 
+                  pokemonData.sprites.front_default;
+        }
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${pokemonID}.png`;
     };
 
     const img = document.createElement("img");
@@ -116,25 +116,25 @@ function createPokemonCard(pokemon, pokemonID, pokemonData) {
     card.querySelector(".card__img").appendChild(img);
 
     card.addEventListener("click", () => {
-      openPokemonDetails(pokemonID);
+        openPokemonDetails(pokemonID);
     });
 
     return { card, imageLoadPromise };
 }
 
 function updatePaginationUI() {
-  mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
-  mainElements.pageInput.value = state.currentPage;
+    mainElements.pageInfo.textContent = `Page ${state.currentPage} of ${state.totalPages}`;
+    mainElements.pageInput.value = state.currentPage;
 
-  document.querySelectorAll(".firstButton, .prevButton").forEach(button => {
-      button.disabled = state.currentPage === 1;
-      button.classList.toggle("disabled", state.currentPage === 1);
-  });
+    document.querySelectorAll(".firstButton, .prevButton").forEach(button => {
+        button.disabled = state.currentPage === 1;
+        button.classList.toggle("disabled", state.currentPage === 1);
+    });
 
-  document.querySelectorAll(".nextButton, .lastButton").forEach(button => {
-      button.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
-      button.classList.toggle("disabled", state.currentPage === state.totalPages || state.totalPages === 0);
-  });
+    document.querySelectorAll(".nextButton, .lastButton").forEach(button => {
+        button.disabled = state.currentPage === state.totalPages || state.totalPages === 0;
+        button.classList.toggle("disabled", state.currentPage === state.totalPages || state.totalPages === 0);
+    });
 }
 
 export async function displayFilteredPokemons() {
@@ -142,45 +142,45 @@ export async function displayFilteredPokemons() {
     toggleLoader(true);
   
     try {
-      const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
-      const end = start + POKEMONS_PER_PAGE;
-      const pokemonsToLoad = state.filteredPokemons.slice(start, end);
-  
-      const pokemonDataList = await Promise.all(
-        pokemonsToLoad.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-      );
-  
-      displayPokemons(pokemonsToLoad, pokemonDataList);
-      updatePaginationUI();
-    } catch (error) {
-      console.error("Error displaying filtered pokemons:", error);
-    } finally {
-      toggleLoader(false);
-    }
+          const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
+          const end = start + POKEMONS_PER_PAGE;
+          const pokemonsToLoad = state.filteredPokemons.slice(start, end);
+      
+          const pokemonDataList = await Promise.all(
+              pokemonsToLoad.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+          );
+      
+          displayPokemons(pokemonsToLoad, pokemonDataList);
+          updatePaginationUI();
+      } catch (error) {
+          console.error("Error displaying filtered pokemons:", error);
+      } finally {
+          toggleLoader(false);
+      }
 }
 
 export function displayNoResultsMessage() {
-  mainElements.listWrapper.innerHTML = `
-    <div class="no-results">No Pokémon found</div>
-  `;
+    mainElements.listWrapper.innerHTML = `
+        <div class="no-results">No Pokémon found</div>
+    `;
 }
 
 export async function loadPage(page) {
-  page = Math.max(1, Math.min(page, state.totalPages));
-  if (page === state.currentPage) return;
+    page = Math.max(1, Math.min(page, state.totalPages));
+    if (page === state.currentPage) return;
 
-  state.currentPage = page;
+    state.currentPage = page;
 
-  await loadPokemons();
+    await loadPokemons();
 }
 
 function displayErrorState() {
-  mainElements.listWrapper.innerHTML = `
-      <div class="error-state">
-          <p>Failed to load Pokémon data</p>
-          <button class="retry-button">Try Again</button>
-      </div>
-  `;
+    mainElements.listWrapper.innerHTML = `
+        <div class="error-state">
+            <p>Failed to load Pokémon data</p>
+            <button class="retry-button">Try Again</button>
+        </div>
+    `;
   
-  mainElements.listWrapper.querySelector(".retry-button")?.addEventListener("click", loadPokemons);
+    mainElements.listWrapper.querySelector(".retry-button")?.addEventListener("click", loadPokemons);
 }

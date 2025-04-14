@@ -3,90 +3,60 @@ import { mainElements } from "../../dictionaries/elements";
 import { fetchPokemonData, getPokemonIDFromURL } from "../api";
 import { loadPokemons } from "../render";
 import { state } from "../state";
+import { toggleLoader } from "../utils";
 
 export async function handleTypeFilterChange() {
     const selectedType = mainElements.filterSelect.value;
     state.currentFilterType = selectedType;
   
     if (!state.allPokemons.length) {
-      console.warn("Pokemons are not yet loaded.");
-      return;
+        console.warn("Pokemons are not yet loaded.");
+        return;
     }
   
-    // Если выбран пустой тип (All Types), сбрасываем фильтр
+    // если выбран all types, сбрасываем фильтры
     if (selectedType === "") {
-      resetTypeFilter();
+        resetTypeFilter();
     } else {
-      await filterPokemonsByType(selectedType);
+        await filterPokemonsByType(selectedType);
     }
-  }
+}
 
-  export async function filterPokemonsByType(type) {
+export async function filterPokemonsByType(type) {
     try {
-      mainElements.listWrapper.innerHTML = "";
-      mainElements.loader.style.display = "flex";
-  
-      if (!type) {
-        // Если тип пустой, сбрасываем фильтрацию
-        state.filteredPokemons = [];
-        state.currentFilterType = "";
-      } else {
-        // Фильтруем покемонов по типу
-        const pokemonDataList = await Promise.all(
-          state.allPokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-        );
+        mainElements.listWrapper.innerHTML = "";
+        toggleLoader(true);
+
+        if (!type) {
+            // если тип пустой, сбрасываем фильтрацию
+            state.filteredPokemons = [];
+            state.currentFilterType = "";
+        } else {
+            const pokemonDataList = await Promise.all(
+                state.allPokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+            );
+            
+            state.filteredPokemons = state.allPokemons.filter((pokemon, index) => {
+                const pokemonData = pokemonDataList[index];
+                return pokemonData && pokemonData.types.some(t => t.type.name === type);
+            });
+
+            state.currentFilterType = type;
+        }
         
-        state.filteredPokemons = state.allPokemons.filter((pokemon, index) => {
-          const pokemonData = pokemonDataList[index];
-          return pokemonData && pokemonData.types.some(t => t.type.name === type);
-        });
-        state.currentFilterType = type;
-        
-        // Применяем текущую сортировку к отфильтрованным покемонам
-        // applyCurrentSort();
-      }
-      
-      // Всегда сбрасываем на первую страницу при фильтрации
-      state.currentPage = 1;
-      
-      // Загружаем покемонов с учетом фильтра
-      await loadPokemons();
-  
+        state.currentPage = 1;
+        await loadPokemons();
     } catch (error) {
-      console.error("Error filtering pokemons by type:", error);
+        console.error("Error filtering pokemons by type:", error);
     } finally {
-      mainElements.loader.style.display = "none";
+        toggleLoader(false);
     }
 }
   
-
 export function resetTypeFilter() {
-    console.log("Resetting type filter, showing all pokemons.");
     state.currentFilterType = "";
     state.filteredPokemons = [...state.allPokemons];
     
-    // Применяем текущую сортировку
-    // applyCurrentSort();
-    
     state.currentPage = 1;
     loadPokemons();
-  }
-
-  // export function applyCurrentSort() {
-  //   const arrayToSort = state.currentDisplay;
-    
-  //   switch(state.sortOption) {
-  //     case 'id-asc':
-  //       arrayToSort.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
-  //       break;
-  //     case 'id-desc':
-  //       arrayToSort.sort((a, b) => getPokemonIDFromURL(b.url) - getPokemonIDFromURL(a.url));
-  //       break;
-  //     case 'name-asc':
-  //       arrayToSort.sort((a, b) => a.name.localeCompare(b.name));
-  //       break;
-  //     case 'name-desc':
-  //       arrayToSort.sort((a, b) => b.name.localeCompare(a.name));
-  //       break;
-  //   }
-  // }
+}

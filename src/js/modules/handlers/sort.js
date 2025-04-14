@@ -5,12 +5,10 @@ import { loadPokemons } from "../render";
 import { state } from "../state";
 
 export function sortPokemons() {
-    // Определяем, какой массив сортировать
     const arrayToSort = state.filteredPokemons.length > 0 
       ? state.filteredPokemons 
       : state.allPokemons;
   
-    // Применяем сортировку
     switch(state.sortOption) {
       case 'id-asc':
         arrayToSort.sort((a, b) => getPokemonIDFromURL(a.url) - getPokemonIDFromURL(b.url));
@@ -26,6 +24,5 @@ export function sortPokemons() {
         break;
     }
   
-    // Обновляем отображение
     loadPokemons();
   }
