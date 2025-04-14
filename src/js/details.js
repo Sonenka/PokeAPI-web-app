@@ -57,8 +57,10 @@ async function fetchPokemonSpeciesData(id) {
 
 function displayPokemonDetails(pokemon, speciesData) {
     // Устанавливаем основной цвет покемона
+    detailsElements.details.style.opacity = "0";
     const mainColor = getPokemonColor(speciesData.color?.name || 'blue');
     document.documentElement.style.setProperty('--pokemon-color', mainColor);
+
     
     // Устанавливаем градиентный фон
     document.body.style.background = `
@@ -117,6 +119,8 @@ function displayPokemonDetails(pokemon, speciesData) {
             ${ability.is_hidden ? '<span class="details__ability--hidden">(hidden)</span>' : ''}
         </div>
     `).join('');
+
+    detailsElements.details.style.opacity = "1";
 }
 
 // Цветовая палитра для типов покемонов
