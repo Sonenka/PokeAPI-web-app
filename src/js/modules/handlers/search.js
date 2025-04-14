@@ -88,7 +88,7 @@ function resetSearch() {
   state.searchTerm = "";
   
   // Возвращаемся к базовому списку
-  state.currentDisplay = state.currentFilterType 
+  state.filteredPokemons = state.currentFilterType 
     ? state.typeFiltered 
     : state.allPokemons;
   
