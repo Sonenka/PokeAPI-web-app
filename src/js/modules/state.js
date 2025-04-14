@@ -1,8 +1,8 @@
 import { mainElements } from "../dictionaries/elements";
 
 export const state = {
-  allPokemons: [],         // Все покемоны (исходный список)
-  filteredPokemons: [],    // Результаты фильтрации/поиска
+  allPokemons: [],
+  filteredPokemons: [],
   currentPage: 1,
   itemsPerPage: 12,
   sortOption: 'id-asc',
@@ -14,8 +14,8 @@ export function openPokemonDetails(pokemonID) {
     const stateToSave = {
       currentPage: state.currentPage,
       currentSort: state.sortOption,
-      currentFilterType: state.currentFilterType || "", // гарантируем строку
-      searchTerm: mainElements.searchInput.value.trim() // используем актуальное значение
+      currentFilterType: state.currentFilterType || "",
+      searchTerm: mainElements.searchInput.value.trim() 
     };
   
     localStorage.setItem('pokedexState', JSON.stringify(stateToSave));
