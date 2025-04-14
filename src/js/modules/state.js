@@ -2,7 +2,10 @@ import { mainElements } from "../dictionaries/elements";
 
 export const state = {
     allPokemons: [],
-    filteredPokemons: [],
+    typeFiltered: [],    // Покемоны, отфильтрованные по типу
+    searchResults: [],   // Результаты поиска
+    currentDisplay: [],  // Текущие покемоны для отображения
+    filteredPokemons: [], // Для обратной совместимости
     currentPage: 1,
     itemsPerPage: 12,
     sortOption: 'id-asc',

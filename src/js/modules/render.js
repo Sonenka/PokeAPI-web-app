@@ -5,43 +5,50 @@ import { POKEMONS_PER_PAGE, fetchPokemonData, getPokemonIDFromURL } from './api.
 import { state, openPokemonDetails } from './state.js';
 import { capitalizeFirstLetter, toggleLoader } from './utils.js';
 
+import { sortPokemons } from './handlers/sort.js';
+
 export async function loadPokemons() {
-    try {
-        mainElements.listWrapper.innerHTML = "";
-        toggleLoader(true);
+  try {
+      mainElements.listWrapper.innerHTML = "";
+      toggleLoader(true);
 
-        const pokemonsToLoad = state.filteredPokemons.length > 0 
-            ? state.filteredPokemons 
-            : state.allPokemons;
+      // Всегда используем currentDisplay для отображения
+      const pokemonsToLoad = state.currentDisplay.length > 0 
+          ? state.currentDisplay 
+          : state.allPokemons;
 
-        state.totalPages = Math.max(1, Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE));
-        state.currentPage = Math.max(1, Math.min(state.currentPage, state.totalPages));
+      // Рассчитываем пагинацию
+      state.totalPages = Math.max(1, Math.ceil(pokemonsToLoad.length / POKEMONS_PER_PAGE));
+      state.currentPage = Math.max(1, Math.min(state.currentPage, state.totalPages));
 
-        // данные текущей страницы
-        const pagePokemons = pokemonsToLoad.slice(
-            (state.currentPage - 1) * POKEMONS_PER_PAGE,
-            state.currentPage * POKEMONS_PER_PAGE
-        );
+      // Получаем данные для текущей страницы
+      const pagePokemons = pokemonsToLoad.slice(
+          (state.currentPage - 1) * POKEMONS_PER_PAGE,
+          state.currentPage * POKEMONS_PER_PAGE
+      );
 
-        const pokemonData = await Promise.all(
-            pagePokemons.map(async pokemon => {
-                try {
-                    return await fetchPokemonData(getPokemonIDFromURL(pokemon.url));
-                } catch (error) {
-                    console.error(`Failed to load pokemon ${pokemon.name}:`, error);
-                    return null;
-                }
-            })
-        );
-        
-        await displayPokemons(pagePokemons, pokemonData); 
-    } catch {
+      // Параллельная загрузка данных с обработкой ошибок для каждого покемона
+      const pokemonData = await Promise.all(
+          pagePokemons.map(async pokemon => {
+              try {
+                  return await fetchPokemonData(getPokemonIDFromURL(pokemon.url));
+              } catch (error) {
+                  console.error(`Failed to load pokemon ${pokemon.name}:`, error);
+                  return null;
+              }
+          })
+      );
+      
+      // Отображаем покемонов текущей страницы
+      await displayPokemons(pagePokemons, pokemonData);
+      
+  } catch (error) {
       console.error("Error loading pokemons:", error);
       displayErrorState();
-    } finally {
-        toggleLoader(false);
-        updatePaginationUI();
-    }
+  } finally {
+      toggleLoader(false);
+      updatePaginationUI();
+  }
 }
 
 function displayPokemons(pokemons, pokemonDataList) {
@@ -142,16 +149,16 @@ export async function displayFilteredPokemons() {
     toggleLoader(true);
   
     try {
-          const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
-          const end = start + POKEMONS_PER_PAGE;
-          const pokemonsToLoad = state.filteredPokemons.slice(start, end);
-      
-          const pokemonDataList = await Promise.all(
-              pokemonsToLoad.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
-          );
-      
-          displayPokemons(pokemonsToLoad, pokemonDataList);
-          updatePaginationUI();
+        const start = (state.currentPage - 1) * POKEMONS_PER_PAGE;
+        const end = start + POKEMONS_PER_PAGE;
+        const pokemonsToLoad = state.filteredPokemons.slice(start, end);
+    
+        const pokemonDataList = await Promise.all(
+            pokemonsToLoad.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
+        );
+          
+        displayPokemons(pokemonsToLoad, pokemonDataList);
+        updatePaginationUI();
       } catch (error) {
           console.error("Error displaying filtered pokemons:", error);
       } finally {
