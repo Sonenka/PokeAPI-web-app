@@ -23,6 +23,8 @@ export function setupEventListeners() {
     mainElements.pageInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") handleGoButtonClick();
     });
+
+    mainElements.goButton.addEventListener("click", handleGoButtonClick);
     
     mainElements.filterSelect.addEventListener("change", handleTypeFilterChange);
     mainElements.searchInput.addEventListener("input", handleSearch);
