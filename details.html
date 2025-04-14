@@ -10,7 +10,9 @@
 <body class="page">
     <div class="details">
         <div class="details__header">
-            <button id="backButton" class="details__back-button">←</button>
+            <button id="backButton" class="details__back-button">
+                <img src="/src/assets/img/backArrow.svg" alt="" class="detaild__back-img">
+            </button>
             <h1 class="details__title" id="pokemonName"></h1>
             <div id="pokemonID" class="details__id"></div>
         </div>
@@ -29,9 +31,12 @@
                         <div class="details__value" id="pokemonHeight"></div>
                         <div class="details__label">Weight:</div>
                         <div class="details__value" id="pokemonWeight"></div>
-                        <div class="details__label">Base Experience:</div>
-                        <div class="details__value" id="pokemonBaseExp"></div>
                     </div>
+                </div>
+
+                <div class="details__section">
+                    <h2 class="details__subtitle">Flavor</h2>
+                    <div class="details__flavor-text"></div>
                 </div>
                 
                 <div class="details__section">

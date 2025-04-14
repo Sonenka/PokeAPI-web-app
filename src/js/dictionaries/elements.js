@@ -26,7 +26,7 @@ const detailsElements = {
     typesContainer: document.getElementById('typesContainer'),
     pokemonHeight: document.getElementById('pokemonHeight'),
     pokemonWeight: document.getElementById('pokemonWeight'),
-    pokemonBaseExp: document.getElementById('pokemonBaseExp'),
+    flavorText: document.querySelector('.details__flavor-text'),
     statsContainer: document.getElementById('statsContainer'),
     abilitiesContainer: document.getElementById('abilitiesContainer'),
     details: document.querySelector(".details")

@@ -75,6 +75,9 @@ function displayPokemonDetails(pokemon, speciesData) {
     detailsElements.pokemonName.textContent = 
         pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
     detailsElements.pokemonID.textContent = `#${String(pokemon.id).padStart(4, '0')}`;
+
+    detailsElements.pokemonName.style.color = mainColor;
+    detailsElements.pokemonName.style.filter = "brightness(50%)";
     
     // Изображение покемона
     const imgUrl = pokemon.sprites.other?.home?.front_default || 
@@ -98,7 +101,6 @@ function displayPokemonDetails(pokemon, speciesData) {
     // Основные характеристики
     detailsElements.pokemonHeight.textContent = `${pokemon.height / 10} m`;
     detailsElements.pokemonWeight.textContent = `${pokemon.weight / 10} kg`;
-    detailsElements.pokemonBaseExp.textContent = pokemon.base_experience || 'Unknown';
     
     // Статистика
     detailsElements.statsContainer.innerHTML = pokemon.stats.map(stat => `
@@ -120,32 +122,14 @@ function displayPokemonDetails(pokemon, speciesData) {
         </div>
     `).join('');
 
-    detailsElements.details.style.opacity = "1";
-}
+    const flavorText = getFlavorText(speciesData);
+    if (flavorText) {
+        detailsElements.flavorText.textContent = flavorText;
+    } else {
+        detailsElements.flavorText.textContent = "No description available.";
+    }
 
-// Цветовая палитра для типов покемонов
-function getTypeColor(type) {
-    const typeColors = {
-        normal: '#A8A878',
-        fire: '#F08030',
-        water: '#6890F0',
-        electric: '#F8D030',
-        grass: '#78C850',
-        ice: '#98D8D8',
-        fighting: '#C03028',
-        poison: '#A040A0',
-        ground: '#E0C068',
-        flying: '#A890F0',
-        psychic: '#F85888',
-        bug: '#A8B820',
-        rock: '#B8A038',
-        ghost: '#705898',
-        dragon: '#7038F8',
-        dark: '#705848',
-        steel: '#B8B8D0',
-        fairy: '#EE99AC'
-    };
-    return typeColors[type] || '#68A090';
+    detailsElements.details.style.opacity = "1";
 }
 
 // Цветовая палитра для основных цветов покемонов
@@ -159,7 +143,7 @@ function getPokemonColor(colorName) {
         pink: '#F85888',
         purple: '#7C538C',
         red: '#FA6555',
-        white: '#bfbfbf',
+        white: '#a38f7e',
         yellow: '#F6C747'
     };
     return colorMap[colorName] || '#68A090'; // fallback цвет
@@ -179,4 +163,17 @@ function lightenColor(color, percent) {
         (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
         (B < 255 ? (B < 1 ? 0 : B) : 255)
     ).toString(16).slice(1)}`;
+}
+
+function getFlavorText(speciesData) {
+    const englishEntries = speciesData.flavor_text_entries?.filter(
+        entry => entry.language.name === 'en'
+    );
+    if (!englishEntries?.length) return null;
+
+    // Берем последнюю запись (часто самая актуальная)
+    const latestEntry = englishEntries[englishEntries.length - 1];
+    return latestEntry.flavor_text
+        .replace(/\n/g, ' ') // Убираем переносы строк
+        .replace(/\f/g, ' '); // Убираем лишние символы
 }
