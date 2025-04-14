@@ -4,6 +4,7 @@ import { fetchPokemonData, getPokemonIDFromURL } from "../api";
 import { loadPokemons } from "../render";
 import { state } from "../state";
 import { toggleLoader } from "../utils";
+import { sortPokemons } from "./sort";
 
 export async function handleTypeFilterChange() {
     const selectedType = mainElements.filterSelect.value;
@@ -29,8 +30,7 @@ export async function filterPokemonsByType(type) {
 
         if (!type) {
             // если тип пустой, сбрасываем фильтрацию
-            state.filteredPokemons = [];
-            state.currentFilterType = "";
+            resetTypeFilter();
         } else {
             const pokemonDataList = await Promise.all(
                 state.allPokemons.map(pokemon => fetchPokemonData(getPokemonIDFromURL(pokemon.url)))
@@ -45,6 +45,7 @@ export async function filterPokemonsByType(type) {
         }
         
         state.currentPage = 1;
+        sortPokemons();
         await loadPokemons();
     } catch (error) {
         console.error("Error filtering pokemons by type:", error);
@@ -58,5 +59,6 @@ export function resetTypeFilter() {
     state.filteredPokemons = [...state.allPokemons];
     
     state.currentPage = 1;
+    sortPokemons();
     loadPokemons();
 }
