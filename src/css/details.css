@@ -130,7 +130,7 @@ body {
 }
 
 .details__value {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .details__label {
@@ -139,7 +139,7 @@ body {
 }
 
 .details__stat {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .details__stat-bar-container {

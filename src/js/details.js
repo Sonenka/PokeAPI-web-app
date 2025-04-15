@@ -12,6 +12,14 @@ const POKEAPI_BASE_URL = 'https://pokeapi.co/api/v2';
 const FALLBACK_COLOR = 'blue';
 const FALLBACK_TEXT = "No description available.";
 
+const MAX_STATS_VALUES = {
+    hp: 255,
+    attack: 190,
+    defense: 230,
+    'special-attack': 194,
+    'special-defense': 230,
+    speed: 200
+};
 
 // Получаем ID покемона из URL
 const pokemonID = new URLSearchParams(window.location.search).get('id') || 
@@ -111,15 +119,22 @@ function displayPokemonDetails(pokemon, speciesData) {
     detailsElements.pokemonWeight.textContent = `${pokemon.weight / 10} kg`;
     
     // Статистика
-    detailsElements.statsContainer.innerHTML = pokemon.stats.map(stat => `
-        <div class="details__stat">
-            <div class="details__stat-name">${stat.stat.name.replace('-', ' ')}</div>
-            <div class="details__stat-bar-container">
-                <div class="details__stat-bar" style="width: ${stat.base_stat}%"></div>
-                <div class="details__stat-value">${stat.base_stat}</div>
+    detailsElements.statsContainer.innerHTML = pokemon.stats.map(stat => {
+        const statName = stat.stat.name;
+        const baseStat = stat.base_stat;
+        const maxStatValue = MAX_STATS_VALUES[statName] || 100; // fallback если стат не найден
+        const percentage = (baseStat / maxStatValue) * 100;
+        
+        return `
+            <div class="details__stat">
+                <div class="details__stat-name">${statName.replace('-', ' ')}</div>
+                <div class="details__stat-bar-container">
+                    <div class="details__stat-bar" style="width: ${percentage}%"></div>
+                    <div class="details__stat-value">${baseStat}</div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
     
     // Способности
     detailsElements.abilitiesContainer.innerHTML = pokemon.abilities.map(ability => `
