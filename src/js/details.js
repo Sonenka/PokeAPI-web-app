@@ -7,6 +7,12 @@ import '../css/card.css';
 import { detailsElements } from './dictionaries/elements.js';
 import typeIcons from './dictionaries/typeIcons.js';
 
+// Константы для API
+const POKEAPI_BASE_URL = 'https://pokeapi.co/api/v2';
+const FALLBACK_COLOR = 'blue';
+const FALLBACK_TEXT = "No description available.";
+
+
 // Получаем ID покемона из URL
 const pokemonID = new URLSearchParams(window.location.search).get('id') || 
                  localStorage.getItem('currentPokemonID');
@@ -17,6 +23,8 @@ if (!pokemonID) {
     loadAndDisplayPokemon(pokemonID);
     setupBackButton();
 }
+
+
 
 async function loadAndDisplayPokemon(id) {
     try {
@@ -37,7 +45,7 @@ function setupBackButton() {
 
 async function fetchPokemonData(id) {
     try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        const response = await fetch(`${POKEAPI_BASE_URL}/pokemon/${id}`);
         return await response.json();
     } catch (error) {
         console.error(`Failed to fetch Pokemon data for ID ${id}:`, error);
@@ -47,7 +55,7 @@ async function fetchPokemonData(id) {
 
 async function fetchPokemonSpeciesData(id) {
     try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}/`);
+        const response = await fetch(`${POKEAPI_BASE_URL}/pokemon-species/${id}/`);
         return await response.json();
     } catch (error) {
         console.error(`Failed to fetch Pokemon species data for ID ${id}:`, error);
@@ -107,7 +115,7 @@ function displayPokemonDetails(pokemon, speciesData) {
         <div class="details__stat">
             <div class="details__stat-name">${stat.stat.name.replace('-', ' ')}</div>
             <div class="details__stat-bar-container">
-                <div class="details__stat-bar" style="width: ${Math.min(100, stat.base_stat)}%"></div>
+                <div class="details__stat-bar" style="width: ${stat.base_stat}%"></div>
                 <div class="details__stat-value">${stat.base_stat}</div>
             </div>
         </div>
@@ -126,7 +134,7 @@ function displayPokemonDetails(pokemon, speciesData) {
     if (flavorText) {
         detailsElements.flavorText.textContent = flavorText;
     } else {
-        detailsElements.flavorText.textContent = "No description available.";
+        detailsElements.flavorText.textContent = FALLBACK_TEXT;
     }
 
     detailsElements.details.style.opacity = "1";
@@ -146,23 +154,21 @@ function getPokemonColor(colorName) {
         white: '#a38f7e',
         yellow: '#F6C747'
     };
-    return colorMap[colorName] || '#68A090'; // fallback цвет
+    return colorMap[colorName] || '#68A090';
 }
 
 // Функция для осветления цвета
 function lightenColor(color, percent) {
     const num = parseInt(color.replace('#', ''), 16);
     const amt = Math.round(2.55 * percent);
-    const R = (num >> 16) + amt;
-    const G = (num >> 8 & 0x00FF) + amt;
-    const B = (num & 0x0000FF) + amt;
     
-    return `#${(
-        0x1000000 +
-        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
-        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
-        (B < 255 ? (B < 1 ? 0 : B) : 255)
-    ).toString(16).slice(1)}`;
+    const clamp = (value) => Math.max(0, Math.min(255, value));
+    
+    const R = clamp((num >> 16) + amt);
+    const G = clamp((num >> 8 & 0x00FF) + amt);
+    const B = clamp((num & 0x0000FF) + amt);
+    
+    return `#${(R << 16 | G << 8 | B).toString(16).padStart(6, '0')}`;
 }
 
 function getFlavorText(speciesData) {

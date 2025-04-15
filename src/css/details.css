@@ -36,12 +36,12 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s;
+    display: flex;
+    align-items: center;
 }
 
-.detaild__back-img {
+.details__back-img {
     height: 36px;
-    fill: white;
-    filter: brightness(1000);
 }
 
 .details__back-button:hover {
@@ -185,6 +185,14 @@ body {
 }
 
 @media (max-width: 768px) {
+    .details {
+        padding: 15px;
+    }
+
+    .details__header {
+        gap: 10px;
+    }
+
     .details__main {
         grid-template-columns: 1fr;
     }
@@ -192,4 +200,23 @@ body {
     .details__image {
         max-width: 200px;
     }
+
+    .details__back-button {
+        padding: 2px 5px;
+        border-radius: 5px;
+    }
+    
+    .details__back-img {
+        height: 16px;
+    }
+
+    .details__title {
+        font-size: 32px;
+    }
+    
+    .details__id {
+        padding: 2px 5px;
+        font-size: 16px;
+    }
+    
 }
