@@ -32,7 +32,19 @@ if (!pokemonID) {
     setupBackButton();
 }
 
-
+// Функция для осветления цвета
+function lightenColor(color, percent) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    
+    const clamp = (value) => Math.max(0, Math.min(255, value));
+    
+    const R = clamp((num >> 16) + amt);
+    const G = clamp((num >> 8 & 0x00FF) + amt);
+    const B = clamp((num & 0x0000FF) + amt);
+    
+    return `#${(R << 16 | G << 8 | B).toString(16).padStart(6, '0')}`;
+}
 
 async function loadAndDisplayPokemon(id) {
     try {
@@ -91,9 +103,6 @@ function displayPokemonDetails(pokemon, speciesData) {
     detailsElements.pokemonName.textContent = 
         pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
     detailsElements.pokemonID.textContent = `#${String(pokemon.id).padStart(4, '0')}`;
-
-    detailsElements.pokemonName.style.color = mainColor;
-    detailsElements.pokemonName.style.filter = "brightness(50%)";
     
     // Изображение покемона
     const imgUrl = pokemon.sprites.other?.home?.front_default || 
@@ -126,7 +135,7 @@ function displayPokemonDetails(pokemon, speciesData) {
         const percentage = (baseStat / maxStatValue) * 100;
         
         return `
-            <div class="details__stat">
+            <div class="details__stat darker">
                 <div class="details__stat-name">${statName.replace('-', ' ')}</div>
                 <div class="details__stat-bar-container">
                     <div class="details__stat-bar" style="width: ${percentage}%"></div>
@@ -138,7 +147,7 @@ function displayPokemonDetails(pokemon, speciesData) {
     
     // Способности
     detailsElements.abilitiesContainer.innerHTML = pokemon.abilities.map(ability => `
-        <div class="details__ability">
+        <div class="details__ability darker">
             ${ability.ability.name.replace('-', ' ').charAt(0).toUpperCase() + 
              ability.ability.name.replace('-', ' ').slice(1)}
             ${ability.is_hidden ? '<span class="details__ability--hidden">(hidden)</span>' : ''}
@@ -151,6 +160,12 @@ function displayPokemonDetails(pokemon, speciesData) {
     } else {
         detailsElements.flavorText.textContent = FALLBACK_TEXT;
     }
+
+    const darkerColor = lightenColor(mainColor, -50);
+    console.log(darkerColor);
+    document.querySelectorAll(".darker").forEach(element => {
+        element.style.color = darkerColor;
+    });
 
     detailsElements.details.style.opacity = "1";
 }
@@ -170,20 +185,6 @@ function getPokemonColor(colorName) {
         yellow: '#F6C747'
     };
     return colorMap[colorName] || '#68A090';
-}
-
-// Функция для осветления цвета
-function lightenColor(color, percent) {
-    const num = parseInt(color.replace('#', ''), 16);
-    const amt = Math.round(2.55 * percent);
-    
-    const clamp = (value) => Math.max(0, Math.min(255, value));
-    
-    const R = clamp((num >> 16) + amt);
-    const G = clamp((num >> 8 & 0x00FF) + amt);
-    const B = clamp((num & 0x0000FF) + amt);
-    
-    return `#${(R << 16 | G << 8 | B).toString(16).padStart(6, '0')}`;
 }
 
 function getFlavorText(speciesData) {
